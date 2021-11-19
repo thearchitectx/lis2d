@@ -1,0 +1,38 @@
+﻿using UnityEngine;
+using UnityEngine.AddressableAssets;
+using TheArchitect.XMLScript;
+
+namespace TheArchitect.Game
+{
+
+    public class XMLScriptBootstrap : UnityEngine.MonoBehaviour
+    {
+
+        [SerializeField] private AssetReferenceGameContext m_Context;
+
+        void Start()
+        {
+            this.m_Context.LoadAssetAsync<GameContext>().Completed += (handle) => {
+                var gameContext = handle.Result;
+                
+                string startScriptPath = gameContext.GetVariable(
+                    GameState.SYSTEM_SCRIPT_PATH_VARIABLE,
+                    gameContext.DefaultStartScript
+                );
+                string startNode = gameContext.GetVariable(
+                    GameState.SYSTEM_SCRIPT_NODE_VARIABLE,
+                    ""
+                );
+
+                Debug.Log($"Bootstraping ({startScriptPath}:{startNode})");
+                GameObject startScriptObject = new GameObject("StartScript");
+                XMLScriptController controller = startScriptObject.AddComponent<XMLScriptController>();
+                controller.Configure(startScriptPath, startNode, gameContext);
+
+                Destroy(this.gameObject);
+            };
+        }
+
+    }
+
+}
