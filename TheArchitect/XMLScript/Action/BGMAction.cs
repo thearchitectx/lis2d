@@ -21,7 +21,7 @@ namespace TheArchitect.XMLScript.Action
         [XmlAttribute("fade-speed")]
         public float FadeSpeed = 1;
         [XmlAttribute("on-root")]
-        public bool OnRoot = false;
+        public bool OnRoot = true;
 
         private Coroutine m_Coroutine = null;
         

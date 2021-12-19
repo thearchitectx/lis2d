@@ -1,10 +1,11 @@
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Collections;
 using System.Xml;
 using System.Xml.Serialization;
 using UnityEngine;
-using TheArchitect;
+using TheArchitect.Core;
 
 namespace TheArchitect.Game
 {
@@ -34,7 +35,7 @@ namespace TheArchitect.Game
                 worker.DoWork += (sender, args) => {
                     File.WriteAllBytes( $"{file}" , data);
                 };
-                worker.RunWorkerCompleted += (sender, args) => Debug.Log($"Saving screenshot at {file} {args.Error?.Message}");
+                worker.RunWorkerCompleted += (sender, args) => { };
                 worker.RunWorkerAsync();
             });
         }
@@ -93,6 +94,33 @@ namespace TheArchitect.Game
             return File.Exists(labelFilePath)
                 ? File.ReadAllBytes(labelFilePath)
                 : new byte[0];
+        }
+
+        public static void CopySlot(string root, string from, string to)
+        {
+            string dir = GetSlotPath(root, to);
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
+            string labelFrom = $"{GetSlotPath(root, from)}/{LABEL_FILE_NAME}";
+            string labelTo = $"{GetSlotPath(root, to)}/{LABEL_FILE_NAME}";
+            if (File.Exists(labelFrom))
+                File.Copy(labelFrom, labelTo, true);
+
+            string stateFrom = $"{GetSlotPath(root, from)}/{STATE_FILE_NAME}";
+            string stateTo = $"{GetSlotPath(root, to)}/{STATE_FILE_NAME}";
+            if (File.Exists(stateFrom))
+                File.Copy(stateFrom, stateTo, true);
+
+            string screenFrom = $"{GetSlotPath(root, from)}/{SCREEN_FILE_NAME}";
+            string screenTo = $"{GetSlotPath(root, to)}/{SCREEN_FILE_NAME}";
+            if (File.Exists(screenFrom))
+                File.Copy(screenFrom, screenTo, true);
+        }
+
+        public static bool HasData(string root, string slot)
+        {
+            return File.Exists( $"{GetSlotPath(root, slot)}/{STATE_FILE_NAME}" );
         }
 
         public static string LoadLastWrite(string root, string slot)

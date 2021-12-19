@@ -21,28 +21,18 @@ namespace TheArchitect.XMLScript
         public string ScriptPath { get { return this.m_ScriptPath; } }
         public GameContext Game { get { return this.m_GameContext; } }
 
-        public void Configure(string scriptPath, string startNode, GameContext context)
+        public void PreStartConfigure(string scriptPath, string startNode, GameContext context)
         {
             this.m_ScriptPath = scriptPath;
             this.m_GameContext = context;
             this.m_StartNode = startNode;
-            this.Reset();
         }
 
-        public void Reset()
+        private void Reload()
         {
             if (this.m_Instance != null)
-                this.m_Instance.Reset();
-                
-            if (this.m_ScriptArgs != null)
-                for (int i =0; i < this.m_ScriptArgs.Length; i++)
-                    Game.SetVariable($"ARG:{i}", this.m_ScriptArgs[i]);
-        }
+                throw new System.Exception("An instance is already active");
 
-        public void Reload()
-        {
-            this.m_Instance = null;
-            this.OnFinished.RemoveAllListeners();
             StartCoroutine(_Reload());
         }
 
@@ -57,21 +47,20 @@ namespace TheArchitect.XMLScript
             while (worker.IsBusy)
                 yield return new WaitForEndOfFrame();
 
-            if (this.m_ScriptArgs != null)
-                for (int i =0; i < this.m_ScriptArgs.Length; i++)
-                    Game.SetVariable($"ARG:{i}", this.m_ScriptArgs[i]);
+            this.FillContextArgs();
 
             this.m_Instance = result;
-            if (!string.IsNullOrEmpty(this.m_StartNode))
+            if (this.m_Instance != null && !string.IsNullOrEmpty(this.m_StartNode))
                 this.m_Instance.JumpToNode(this.m_StartNode);
         }
 
         /**
         * Start 
         */
-        void Start()
+        void OnEnable()
         {
-            Reload();
+            if (this.m_Instance == null)
+                Reload();
         }
 
         /**
@@ -88,12 +77,8 @@ namespace TheArchitect.XMLScript
                 {
                     var outcome = this.m_Instance.Outcome;
 
-                    if (this.m_ScriptArgs != null)
-                        for (int i =0; i < this.m_ScriptArgs.Length; i++)
-                            Game.UnsetVariable($"ARG:{i}");
-                    
-                    this.OnFinished.Invoke(this.m_Instance.Outcome);
-                    this.OnFinished.RemoveAllListeners();
+                    this.OnFinished.Invoke(outcome);
+                    this.m_Instance = null;
 
                     if (outcome == XMLScriptAction.OUTCOME_DESTROY_OBJECT) 
                         Destroy(this.gameObject, 1);
@@ -101,6 +86,7 @@ namespace TheArchitect.XMLScript
                         Destroy(this, 1);
                     else if (outcome == XMLScriptAction.OUTCOME_DESTROY_PARENT)
                         Destroy(this.transform.parent.gameObject, 1);
+
                 } else {
                     this.m_Instance.Update(this);
                 }
@@ -155,6 +141,13 @@ namespace TheArchitect.XMLScript
                 return transform.parent.Find(name.Substring(3))?.transform;
 
             return this.transform.Find(name);
+        }
+
+        private void FillContextArgs()
+        {
+            if (this.m_ScriptArgs != null)
+                for (int i =0; i < this.m_ScriptArgs.Length; i++)
+                    Game.SetVariable($"ARG:{i}", this.m_ScriptArgs[i]);
         }
 
     }

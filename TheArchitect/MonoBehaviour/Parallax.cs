@@ -37,7 +37,7 @@ public class Parallax : MonoBehaviour
 
         if (this.m_RotateFactorY != 0)
         {
-            this.transform.rotation = Quaternion.Euler(0, 0, cameraOffset.magnitude * Mathf.Sign(cameraOffset.y) * this.m_RotateFactorY);
+            this.transform.rotation = Quaternion.Euler(0, 0, cameraOffset.y * this.m_RotateFactorY);
         }
     }
 

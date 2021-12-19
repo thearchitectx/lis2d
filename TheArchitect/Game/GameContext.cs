@@ -18,12 +18,14 @@ namespace TheArchitect.Game
     {
         [SerializeField] public string DefaultStartScript;
         [NonSerialized] private Dictionary<string, Variable> m_StateIndex;
-        [NonSerialized] private int m_StateChangeCount;
+        [NonSerialized] private int m_StateChangeCount; 
+        [NonSerialized] private float m_PlayTimeStart;
 
         void OnEnable()
         {
             Debug.Log("GameContext OnEnable");
             this.m_StateIndex = new Dictionary<string, Variable>();
+            this.FillItemData();
         }
 
         public int StateChangeCount {
@@ -46,11 +48,16 @@ namespace TheArchitect.Game
                 : null;
         }
 
+        public IEnumerable<string> GetVariableNames()
+        {
+            return this.m_StateIndex.Keys;
+        }
+
         public void SetVariable(string name, int state) { this.SetVariableEx(name, state); }
         public void SetVariable(string name, float state) { this.SetVariableEx(name, state); }
         public void SetVariable(string name, string state) { this.SetVariableEx(name, state); }
 
-        private void SetVariableEx(string name, object state)
+        private void SetVariableEx(string name, object state, bool log = true)
         {
             if (this.m_StateIndex.ContainsKey(name))
             {
@@ -70,8 +77,8 @@ namespace TheArchitect.Game
             }
 
             #if UNITY_EDITOR
-            if (!name.StartsWith("SYSTEM"))
-                Debug.Log($"SetVariable {name}={state}  #{m_StateChangeCount}");
+            if (log && !name.StartsWith("SYSTEM"))
+                Debug.Log($"SetVariable {name}={state}");
             #endif
         }
 
@@ -93,11 +100,19 @@ namespace TheArchitect.Game
                 this.SetVariable(GameState.SYSTEM_VERSION, Application.version);
             }
 
+            float playTime = Time.unscaledTime - this.m_PlayTimeStart + this.GetVariable(GameState.SYSTEM_PLAYTIME, 0f);
+            this.m_PlayTimeStart = Time.unscaledTime;
+            this.SetVariable(GameState.SYSTEM_PLAYTIME, playTime);
+
             return new GameState() {
                 Flags = this.m_StateIndex.Values.Where( v => v is FlagVariable ).Select( v => (FlagVariable) v).ToArray(),
                 Strings = this.m_StateIndex.Values.Where( v => v is StringVariable ).Select( v => (StringVariable) v).ToArray(),
                 Floats = this.m_StateIndex.Values.Where( v => v is FloatVariable ).Select( v => (FloatVariable) v).ToArray()
             };
+        }
+
+        public float PlayTime {
+            get { return Time.unscaledTime - this.m_PlayTimeStart + this.GetVariable(GameState.SYSTEM_PLAYTIME, 0f); }
         }
 
         public void ApplyStateInstance(GameState gameState)
@@ -109,7 +124,20 @@ namespace TheArchitect.Game
                 foreach (var f in gameState.Floats) this.m_StateIndex.Add(f.Name, f);
             if (gameState.Strings!=null)
                 foreach (var s in gameState.Strings) this.m_StateIndex.Add(s.Name, s);
+
             this.m_StateChangeCount = 0;
+            this.m_PlayTimeStart = Time.unscaledTime;
+            this.FillItemData();
+        }
+
+        private void FillItemData()
+        {
+            TheArchitect.Core.Items.GetItems().ToList().ForEach( item => {
+                this.SetVariableEx($"ITEM:{item.Id}:LABEL", item.Label, false);
+                this.SetVariableEx($"ITEM:{item.Id}:ICON", item.Icon, false);
+                this.SetVariableEx($"ITEM:{item.Id}:PRICE", item.Price, false);
+                this.SetVariableEx($"ITEM:{item.Id}:DESCRIPTION", item.Description, false);
+            });
         }
     }
 

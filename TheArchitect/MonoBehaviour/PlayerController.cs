@@ -7,6 +7,8 @@ using TheArchitect.Core;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private Animator m_SkeletonRoot;
+    [SerializeField] private Animator m_SkeletonRootMirror;
+    [SerializeField] private Transform m_PerceptionField;
     [SerializeField] private float m_Speed;
 
     private bool m_InputActive = true;
@@ -15,16 +17,41 @@ public class PlayerController : MonoBehaviour
 
     public bool Crouching { get { return this.m_Crouching; }}
 
+    public void LookAt(Quaternion rot)
+    {
+        if (rot.eulerAngles.y > 0)
+            LookLeft();
+        else
+            LookRight();
+    }
+
     public void SetInputActive(bool active)
     {
         this.m_InputActive = active;
+    }
+
+    public void LookLeft()
+    {
+        this.m_SkeletonRootMirror.gameObject.SetActive(true);
+        this.m_SkeletonRoot.gameObject.SetActive(false);
+        this.m_PerceptionField.right = Vector2.left;
+    }
+
+    public void LookRight()
+    {
+        this.m_SkeletonRootMirror.gameObject.SetActive(false);
+        this.m_SkeletonRoot.gameObject.SetActive(true);
+        this.m_PerceptionField.right = Vector2.right;
     }
 
     // Start is called before the first frame update
     void Start()
     {
         this.m_RigidBody = this.GetComponent<Rigidbody2D>();
+        if (this.m_SkeletonRootMirror.gameObject.activeSelf && this.m_SkeletonRoot.gameObject.activeSelf)
+            LookRight();
     }
+    
 
     // Update is called once per frame
     void Update()
@@ -32,16 +59,25 @@ public class PlayerController : MonoBehaviour
         var x = this.m_InputActive ? Input.GetAxisRaw("Horizontal") : 0; 
         var y = this.m_InputActive ? Input.GetAxisRaw("Vertical") : 0; 
 
-        this.m_Crouching = y < 0;
-        this.m_SkeletonRoot.SetBool("crouch", this.m_Crouching);
-
+        if (this.m_InputActive)
+            this.m_Crouching = y < 0;
+            
         this.m_RigidBody.velocity = new Vector2( y < 0 ? 0 :  x * this.m_Speed, this.m_RigidBody.velocity.y);
         
-        if (this.m_RigidBody.velocity.x != 0)
-        {
-            this.m_SkeletonRoot.transform.right = new Vector2(this.m_RigidBody.velocity.x, 0);
-        }
+        if (this.m_RigidBody.velocity.x > 0)
+            LookRight();
+        else  if (this.m_RigidBody.velocity.x < 0)
+            LookLeft();
 
-        this.m_SkeletonRoot.SetBool("walking", this.m_RigidBody.velocity.x != 0);
+        if (this.m_SkeletonRoot.gameObject.activeInHierarchy)
+        {
+            this.m_SkeletonRoot.SetBool("walking", this.m_RigidBody.velocity.x > 0);
+            this.m_SkeletonRoot.SetBool("crouch", this.m_Crouching);
+        }
+        else if (this.m_SkeletonRootMirror.gameObject.activeInHierarchy)
+        {
+            this.m_SkeletonRootMirror.SetBool("walking", this.m_RigidBody.velocity.x < 0);
+            this.m_SkeletonRootMirror.SetBool("crouch", this.m_Crouching);
+        }
     }
 }

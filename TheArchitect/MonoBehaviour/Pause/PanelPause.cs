@@ -9,7 +9,6 @@ namespace TheArchitect.MonoBehaviour.Pause
     {
         [SerializeField] public Toggle ButtonStats;
         [SerializeField] public Toggle ButtonItems;
-        [SerializeField] public Toggle ButtonCharacters;
         [SerializeField] public Toggle ButtonObjectives;
         [SerializeField] public Button ButtonQuit;
         [SerializeField] public Button ButtonLoadSave;
@@ -18,7 +17,6 @@ namespace TheArchitect.MonoBehaviour.Pause
 
         [SerializeField] private GameObject PanelStatsPrefab;
         [SerializeField] private GameObject PanelItemsPrefab;
-        [SerializeField] private GameObject PanelCharactersPrefab;
         [SerializeField] private GameObject PanelObjectivesPrefab;
 
         public GameContext Context;
@@ -36,8 +34,6 @@ namespace TheArchitect.MonoBehaviour.Pause
             GameObject g = null;
             if (ButtonStats.isOn)
                 g = Instantiate(PanelStatsPrefab);
-            else if (ButtonCharacters.isOn)
-                g = Instantiate(PanelCharactersPrefab);
             else if (ButtonItems.isOn)
                 g = Instantiate(PanelItemsPrefab);
             else if (ButtonObjectives.isOn)
@@ -53,7 +49,7 @@ namespace TheArchitect.MonoBehaviour.Pause
             
             Text t = ButtonQuit.GetComponentInChildren<Text>();
             if (t.text == CONFIRM)
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Title");
+                UnityEngine.SceneManagement.SceneManager.LoadScene("title");
             else
                 t.text = CONFIRM;
         }

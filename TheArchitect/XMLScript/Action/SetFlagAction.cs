@@ -16,8 +16,12 @@ namespace TheArchitect.XMLScript.Action
         public string Copy = null;
         [XmlAttribute("inc")]
         public string Inc = null;
+        [XmlAttribute("dec")]
+        public string Dec = null;
         [XmlAttribute("set")]
         public string Set = null;
+        [XmlAttribute("random-max")]
+        public string Random = null;
         [XmlAttribute("bit-on")]
         public string BitOn = null;
         [XmlAttribute("bit-off")]
@@ -47,6 +51,12 @@ namespace TheArchitect.XMLScript.Action
                 controller.Game.SetVariable(resolvedName, v + ResourceString.ParseToInt(Inc, controller.Game.GetVariable));
             }
 
+            if (!string.IsNullOrEmpty(Dec))
+            {
+                int v = controller.Game.GetVariable(resolvedName, 0);
+                controller.Game.SetVariable(resolvedName, v - ResourceString.ParseToInt(Dec, controller.Game.GetVariable));
+            }
+
             if (!string.IsNullOrEmpty(Set ))
             {
                 controller.Game.SetVariable(resolvedName, ResourceString.ParseToInt(Set, controller.Game.GetVariable));
@@ -64,10 +74,17 @@ namespace TheArchitect.XMLScript.Action
                 controller.Game.SetVariable(resolvedName, v | 1 << ResourceString.ParseToInt(BitOn, controller.Game.GetVariable));
             }
 
+            if (!string.IsNullOrEmpty(Random))
+            {
+                int max = ResourceString.ParseToInt(Random, controller.Game.GetVariable);
+                int v = UnityEngine.Random.Range(1, max+1);
+                controller.Game.SetVariable(resolvedName, v);
+            }
+
             if (!string.IsNullOrEmpty(Message))
             {
                 LogAction log = new LogAction() { Text = Message, Icon = this.MessageIcon };
-                controller.StartCoroutine(log.Log(controller));
+                log.Log(controller);
             }
 
             return OUTPUT_NEXT;

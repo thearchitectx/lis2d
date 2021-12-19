@@ -26,6 +26,9 @@ namespace TheArchitect.MonoBehaviour.Perceptibles
 
         void LateUpdate()
         {
+            if (Time.deltaTime==0)
+                return;
+                
             if (this.m_Choice != null || (this.m_Activated != null && this.m_Activated.OnActivated.gameObject.activeInHierarchy))
                 return;
 

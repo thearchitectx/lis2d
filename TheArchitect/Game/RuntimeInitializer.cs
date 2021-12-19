@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace TheArchitect.Game
 {
@@ -7,11 +8,16 @@ namespace TheArchitect.Game
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnBeforeSceneLoadRuntimeMethod()
         {
+            Debug.Log("RuntimeInitialize");
             #if UNITY_EDITOR
             QualitySettings.vSyncCount = 0;  // VSync must be disabled
             Application.targetFrameRate = 60;
             #endif
             // Game game = Resources.Load<Game>("ScriptableObjects/Game");
+
+            // SceneManager.sceneLoaded += (scene, loadMode) => {
+            //     Time.timeScale = 1;
+            // };
 
             // SceneManager.sceneLoaded += (scene, loadMode) => {
             //     Time.timeScale = 1;

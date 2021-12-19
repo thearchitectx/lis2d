@@ -45,6 +45,10 @@ namespace TheArchitect.MonoBehaviour.Pause
             this.m_IgnoreException = PlayerPrefs.GetInt(PLAYER_PREF_IGNORE_EXCEPTION, 0) == 1;
         }
 
+        void OnDestroy() {
+            this.m_Context.SetVariable(GameState.SYSTEM_PLAYTIME, this.m_Context.GetVariable(GameState.SYSTEM_PLAYTIME, 0f) + Time.timeSinceLevelLoad );
+        }
+
         // void OnDisable()
         // {
         //     Application.logMessageReceived -= HandleException;
@@ -165,20 +169,20 @@ namespace TheArchitect.MonoBehaviour.Pause
 
         public void ToggleTrophies()
         {
-            // if (this.m_CanvasTrophies == null)
-            // {
-            //     this.m_CanvasTrophies = Instantiate(this.CanvasTrophiesPrefab).GetComponent<Transform>();
-            //     this.m_CanvasTrophies.SetParent(this.transform, false);
-            //     this.m_CanvasTrophies.GetComponentInChildren<PanelTrophies>()
-            //         .ButtonBack.onClick.AddListener(() => ToggleTrophies()
-            //     );
-            //     this.m_CanvasPause.gameObject.SetActive(false);
-            // }
-            // else
-            // {
-            //     Destroy(this.m_CanvasTrophies.gameObject);
-            //     this.m_CanvasPause.gameObject.SetActive(true);
-            // }
+            if (this.m_CanvasTrophies == null)
+            {
+                this.m_CanvasTrophies = Instantiate(this.CanvasTrophiesPrefab).GetComponent<Transform>();
+                this.m_CanvasTrophies.SetParent(this.transform, false);
+                this.m_CanvasTrophies.GetComponentInChildren<PanelTrophies>()
+                    .ButtonBack.onClick.AddListener(() => ToggleTrophies()
+                );
+                this.m_PanelPause.gameObject.SetActive(false);
+            }
+            else
+            {
+                Destroy(this.m_CanvasTrophies.gameObject);
+                this.m_PanelPause.gameObject.SetActive(true);
+            }
 
         }
 

@@ -4,7 +4,7 @@ namespace TheArchitect.SceneObjects
 {
     public class SceneObject : MonoBehaviour
     {
-        public const string OUTCOME_END = "OUTCOME_END";
+        public const string OUTCOME_END = "END";
         
         [System.NonSerialized] public string Outcome;
 

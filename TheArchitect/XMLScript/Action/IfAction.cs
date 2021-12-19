@@ -84,11 +84,11 @@ namespace TheArchitect.XMLScript.Action
         [XmlAttribute("inverse")]
         public bool Inverse = false;
         [XmlAttribute("eq")]
-        public int Eq = int.MinValue;
+        public string Eq = null;
         [XmlAttribute("gte")]
-        public int Gte = int.MinValue;
+        public string Gte = null;
         [XmlAttribute("lte")]
-        public int Lte = int.MinValue;
+        public string Lte = null;
         [XmlAttribute("mod")]
         public int Mod = int.MinValue;
         [XmlAttribute("bit-set")]
@@ -104,12 +104,12 @@ namespace TheArchitect.XMLScript.Action
             bool b = false;
             if (Mod > int.MinValue)
                 flagValue = flagValue % Mod;
-            if (Eq > int.MinValue)
-                b = b || flagValue == Eq;
-            if (Gte > int.MinValue)
-                b = b || flagValue >= Gte;
-            if (Lte > int.MinValue)
-                b = b || flagValue <= Lte;
+            if (!string.IsNullOrEmpty(Eq))
+                b = b || flagValue == ResourceString.ParseToInt(Eq, context.GetVariable) ;
+            if (!string.IsNullOrEmpty(Gte))
+                b = b || flagValue >= ResourceString.ParseToInt(Gte, context.GetVariable) ;
+            if (!string.IsNullOrEmpty(Lte))
+                b = b || flagValue <= ResourceString.ParseToInt(Lte, context.GetVariable) ;
             if (BitSet < 32)
                 b = b || ( (flagValue & (1 << BitSet)) != 0 );
             if (BitUnset < 32)

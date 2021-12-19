@@ -19,7 +19,7 @@ public class HideWhenConterNotOnCamera : MonoBehaviour
     void Update()
     {
         Vector2 v = Camera.main.WorldToViewportPoint(this.transform.position);
-        float target =  ( v.x < 0 - m_BorderPadding || v.x > 1 + m_BorderPadding || v.y < 0 - m_BorderPadding || v.y < 1 + m_BorderPadding )
+        float target =  ( v.x > 0 - m_BorderPadding && v.x < 1 + m_BorderPadding && v.y > 0 - m_BorderPadding && v.y < 1 + m_BorderPadding)
             ? this.m_OpacityWhenVisible : 0;
 
         Color c = this.m_Renderer.color;

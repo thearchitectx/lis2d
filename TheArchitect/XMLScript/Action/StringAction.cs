@@ -48,7 +48,7 @@ namespace TheArchitect.XMLScript.Action
             if (!string.IsNullOrEmpty(Message))
             {
                 LogAction log = new LogAction() { Text = Message };
-                controller.StartCoroutine(log.Log(controller));
+                log.Log(controller);
             }
 
             return OUTPUT_NEXT;

@@ -16,6 +16,9 @@ namespace TheArchitect.XMLScript.Action
         RENEGADE = 2,
         SAVE = 3,
         QUEST = 4,
+        KEY = 5,
+        LOCKPICK = 6,
+        MONEY = 7,
     }
 
     public class LogAction : XMLScriptAction
@@ -25,63 +28,29 @@ namespace TheArchitect.XMLScript.Action
         [XmlText]
         public string Text;
 
-        private Coroutine m_Coroutine = null;
-        private string m_Output = null;
-        
-        public override void ResetState()
-        {
-            this.m_Coroutine = null;
-            this.m_Output = null;
-        }
-
         public override string Update(XMLScriptInstance instance, XMLScriptController controller)
         {
-            if (this.m_Coroutine == null)
-                this.m_Coroutine = controller.StartCoroutine(
-                    Log(controller)
-                );
-            
-            return this.m_Output;
+            Log(controller);
+            return OUTPUT_NEXT;
         }
 
-        private static bool m_HasInstanceLoadingLogger = false;
-        
-        public System.Collections.IEnumerator Log(XMLScriptController controller)
+        public void Log(XMLScriptController controller)
         {
-            while (LogAction.m_HasInstanceLoadingLogger)
-                yield return new WaitWhile( () => LogAction.m_HasInstanceLoadingLogger );
-
             try
             {
-                LogAction.m_HasInstanceLoadingLogger = true;
-
                 PanelLogger logger = GameObject.FindWithTag("Logger")?.GetComponentInChildren<PanelLogger>();
-                if (logger == null)
-                {
-                    var handlePanel = Addressables.InstantiateAsync("panel-logger.prefab");
 
-                    handlePanel.Completed += (h) => {
-                        logger = handlePanel.Result.GetComponent<PanelLogger>();
-                    };
-
-                    yield return handlePanel;
-                }
-
-                Sprite icon = null;
+                string icon = null;
                 if (this.Icon != UIIcon.NONE)
                 {
-                    var handleIcon = Addressables.LoadAssetAsync<Sprite>($"icon-{this.Icon.ToString().ToLower()}");
-                    yield return handleIcon;
-
-                    icon = handleIcon.Result;
+                    icon = $"icon-{this.Icon.ToString().ToLower()}";
                 }
 
                 logger.AddItem(ResourceString.Parse(this.Text, controller.Game.GetVariable), icon);
             }
-            finally
+            catch (System.Exception e)
             {
-                LogAction.m_HasInstanceLoadingLogger = false;
-                this.m_Output = OUTPUT_NEXT;
+                Debug.Log(e);
             }
 
         }

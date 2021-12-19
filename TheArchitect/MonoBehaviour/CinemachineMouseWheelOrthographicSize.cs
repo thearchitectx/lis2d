@@ -21,7 +21,7 @@ public class CinemachineMouseWheelOrthographicSize : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        this.m_Target = Mathf.Clamp(this.m_Target + Input.mouseScrollDelta.y * this.m_WheelSpeed, this.m_MinSize, this.m_MaxSize);
+        this.m_Target = Mathf.Clamp(this.m_Target - Input.mouseScrollDelta.y * this.m_WheelSpeed, this.m_MinSize, this.m_MaxSize);
         this.m_Camera.m_Lens.OrthographicSize = Mathf.MoveTowards(this.m_Camera.m_Lens.OrthographicSize, this.m_Target, Time.deltaTime * m_LensSpeed);
     }
 }

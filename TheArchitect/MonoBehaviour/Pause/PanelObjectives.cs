@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TheArchitect.Game;
+using System.Linq;
 
 namespace  TheArchitect.MonoBehaviour.Pause
 {
@@ -9,30 +10,25 @@ namespace  TheArchitect.MonoBehaviour.Pause
         [SerializeField] private Transform m_Parent;
         [SerializeField] private Text m_TextDay;
         [SerializeField] private GameObject m_TextObjectivePrefab;
-        [SerializeField] private GameObject m_TextObjectiveDescriptionPrefab;
         [SerializeField] private GameContext m_Game;
 
         private string[] m_Days = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"};
+
         // Start is called before the first frame update
-        // void Start()
-        // {
-        //     int day = Mathf.Clamp(this.m_Game.GetFlagState("DATA_CURRENT_DAY"), 1, int.MaxValue);
-        //     this.m_TextDay.text = m_Days[Mathf.Clamp(day-1, 0, m_Days.Length-1) ];
+        void Start()
+        {
+            int day = Mathf.Clamp(this.m_Game.GetVariable("DAY:CURRENT", 1), 1, int.MaxValue);
+            this.m_TextDay.text = m_Days[Mathf.Clamp(day-1, 0, m_Days.Length-1) ];
 
-        //     foreach (var objective in this.m_Game.GetObjectives())
-        //     {
-        //         if (objective!=null)
-        //         {
-        //             var textTitle = GameObject.Instantiate(this.m_TextObjectivePrefab).GetComponent<Text>();
-        //             textTitle.text = $"- {objective.Title}";
-        //             textTitle.transform.SetParent(this.m_Parent, false);
+            this.m_Game.GetVariableNames()
+                .Where( v => v.StartsWith("QUEST:") && v.EndsWith(":OBJECTIVE") )
+                .ToList()
+                .ForEach( v => {
+                    var textDescription = GameObject.Instantiate(this.m_TextObjectivePrefab, this.m_Parent, false).GetComponentInChildren<Text>();
+                    textDescription.text = this.m_Game.GetVariable(v, "");
+                });
 
-        //             var textDescription = GameObject.Instantiate(this.m_TextObjectiveDescriptionPrefab).GetComponent<Text>();
-        //             textDescription.text = objective.Description;
-        //             textDescription.transform.SetParent(this.m_Parent, false);
-        //         }
-        //     }
-        // }
+        }
 
     }
 

@@ -11,9 +11,9 @@ namespace TheArchitect.XMLScript.Action
         [XmlAttribute("target")]
         public string Target = null;
         [XmlAttribute("idle")]
-        public BehaviourAlias Idle = BehaviourAlias.NONE;
+        public IdleAlias Idle = IdleAlias.NONE;
         [XmlAttribute("face")]
-        public BehaviourAlias Face = BehaviourAlias.NONE;
+        public FaceAlias Face = FaceAlias.NONE;
         [XmlAttribute("waitEndOfClip")]
         public int waitEndOfClip = -1;
         [XmlElement("bool")]
@@ -58,10 +58,10 @@ namespace TheArchitect.XMLScript.Action
                 if (Trigger != null)
                     this.m_Animator.SetTrigger(Trigger);
 
-                if (Idle != BehaviourAlias.NONE)
+                if (Idle != IdleAlias.NONE)
                     this.m_Animator.SetInteger("idle", (int) Idle);
                     
-                if (Face != BehaviourAlias.NONE)
+                if (Face != FaceAlias.NONE)
                     this.m_Animator.SetInteger("face", (int) Face);
 
                 if (this.Booleans != null)
@@ -91,12 +91,22 @@ namespace TheArchitect.XMLScript.Action
             return this.m_Output;
         }
 
-        public enum BehaviourAlias
+        public enum FaceAlias
         {
             NONE = 0,
             CUTE = 1,
             DISAPPROVE = 2,
-            SERIOUS = 3,
+            NEUTRAL = 3,
+            UPSET = 4,
+            SIGH = 5,
+        }
+
+        public enum IdleAlias
+        {
+            NONE = 0,
+            CUTE = 1,
+            NEUTRAL = 3,
+            UPSET = 4
         }
 
         public class AnimBool

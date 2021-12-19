@@ -26,9 +26,10 @@ namespace TheArchitect.MonoBehaviour.Perceptibles
         void Start()
         {
             this.m_Context.LoadAssetAsync().Completed += (handle) => {
+                this.m_Label = ResourceString.Parse(this.m_Label, handle.Result.GetVariable).ToUpper();
                 if (this.m_Text != null)
                 {
-                    this.m_Text.text = ResourceString.Parse(this.m_Label, handle.Result.GetVariable).ToUpper();
+                    this.m_Text.text = this.m_Label;
                 }
                 m_Context.ReleaseAsset();
             };

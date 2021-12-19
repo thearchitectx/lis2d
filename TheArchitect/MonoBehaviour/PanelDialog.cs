@@ -21,6 +21,7 @@ namespace TheArchitect.MonoBehaviour
         const int PADDING_MESSAGE_RIGHT = 15;
         const int PADDING_MESSAGE_BOTTOM = 5;
         const int PADDING_MESSAGE_TOP = 0;
+        const int PANEL_WIDTH = 0;
 
         [SerializeField] public Transform TrackedTransform = null;
         [SerializeField] private Sprite m_SpriteLeft;
@@ -41,6 +42,7 @@ namespace TheArchitect.MonoBehaviour
         private RectTransform m_CanvasTransform;
         private bool m_IsRollingText;
         private DialogStyle m_Style;
+        private bool m_LastFrameWasRight;
 
         public bool IsRollingText { get { return m_IsRollingText; } }
         public bool HasPendingText { get { return this.m_MessagePosition < this.m_Message.Length; } }
@@ -98,7 +100,9 @@ namespace TheArchitect.MonoBehaviour
                     (1 - pos.y) * this.m_CanvasTransform.rect.height
                 );
 
-                bool right = pos.x - 50 > this.m_CanvasTransform.rect.width / 2;
+                bool right = pos.x + ( this.m_LastFrameWasRight ? 25 : -25 ) > this.m_CanvasTransform.rect.width / 2;
+
+                this.m_LastFrameWasRight = right;
 
                 pos = new Vector2(
                     right ? pos.x - this.m_MainRectTransform.rect.width : pos.x,

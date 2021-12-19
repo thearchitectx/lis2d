@@ -29,6 +29,7 @@ namespace TheArchitect.XMLScript
             XmlElement("debug-log", typeof(DebugLogAction)),
             XmlElement("script-outcome", typeof(ScriptOutcomeAction)),
             XmlElement("node-output", typeof(OutputAction)),
+            XmlElement("inject", typeof(InjectAction)),
             XmlElement("autosave", typeof(AutosaveAction)),
             XmlElement("obj", typeof(ObjectAction)),
             XmlElement("load-scene-object", typeof(LoadSceneObjectAction)),
@@ -43,7 +44,8 @@ namespace TheArchitect.XMLScript
             XmlElement("if", typeof(IfAction)),
             XmlElement("flag", typeof(SetFlagAction)),
             XmlElement("string", typeof(StringAction)),
-        //     XmlElement("trophy", typeof(TrophyAction)),
+            XmlElement("trophy", typeof(TrophyAction)),
+            XmlElement("switch-text", typeof(SwitchTextAction)),
             XmlElement("sfx", typeof(SFXAction)),
             XmlElement("bgm", typeof(BGMAction)),
         ]

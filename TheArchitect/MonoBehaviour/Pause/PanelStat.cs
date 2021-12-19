@@ -6,9 +6,8 @@ namespace TheArchitect.MonoBehaviour.Pause
 
     public class PanelStat : UnityEngine.MonoBehaviour
     {
-        [SerializeField] public Text TextLabel;
-        [SerializeField] public Text TextValue;
-        [SerializeField] public Image ImageStar;
+        [SerializeField] public Text TextState;
+        [SerializeField] public Image ImageIcon;
     }
 
 }

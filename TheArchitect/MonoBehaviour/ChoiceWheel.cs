@@ -8,7 +8,12 @@ namespace TheArchitect.MonoBehaviour
 
     public enum ChoicePos
     {
-        NE = 0, SE = 1, SW = 2, NW = 3, E = 4, W = 5
+        NONE = -1, NE = 0, SE = 1, SW = 2, NW = 3, E = 4, W = 5
+    }
+
+    public enum ChoiceStyle
+    {
+        STANDARD, PARAGON, RENEGADE
     }
 
     public class ChoiceWheel : UnityEngine.MonoBehaviour
@@ -18,6 +23,7 @@ namespace TheArchitect.MonoBehaviour
         {
             public string Id;
             public ChoicePos Pos;
+            public ChoiceStyle style;
             public string Text;
             public bool Interactable;
         }
@@ -25,13 +31,15 @@ namespace TheArchitect.MonoBehaviour
         public class ChoiceEvent : UnityEvent<string> { }
 
         [SerializeField] private Button[] m_Buttons;
+        [SerializeField] private RuntimeAnimatorController m_AnimatorParagon;
+        [SerializeField] private RuntimeAnimatorController m_AnimatorRenegade;
 
         private List<Choice> m_Choices = new List<Choice>();
         public ChoiceEvent onChoice = new ChoiceEvent();
 
-        public void AddChoice(string id, ChoicePos pos, string text, bool interactable)
+        public void AddChoice(string id, ChoicePos pos, ChoiceStyle style, string text, bool interactable)
         {
-            this.m_Choices.Add(new Choice() { Id = id, Text = text, Pos = pos,  Interactable = interactable });
+            this.m_Choices.Add(new Choice() { Id = id, Text = text, style = style, Pos = pos,  Interactable = interactable });
         }
 
         public void BuildChoices()
@@ -44,6 +52,12 @@ namespace TheArchitect.MonoBehaviour
                 Button b = this.m_Buttons[(int) c.Pos];
                 b.interactable = c.Interactable;
                 b.GetComponentInChildren<Text>().text = c.Text;
+                
+                if (c.style == ChoiceStyle.PARAGON)
+                    b.GetComponent<Animator>().runtimeAnimatorController = this.m_AnimatorParagon;
+                if (c.style == ChoiceStyle.RENEGADE)
+                    b.GetComponent<Animator>().runtimeAnimatorController = this.m_AnimatorRenegade;
+
                 b.onClick.AddListener(
                     () => {  if (Time.timeScale>0) onChoice.Invoke(c.Id); }
                 );

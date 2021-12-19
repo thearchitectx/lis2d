@@ -108,7 +108,7 @@ namespace TheArchitect.XMLScript.Action
                     this.Messages[this.m_CurrentMessage].Instant,
                     this.Style
                 );
-            } else if (Input.GetMouseButtonDown(0) || Input.GetButtonDown("Jump"))
+            } else if (this.TimeToLive == 0 && Input.GetMouseButtonDown(0) || Input.GetButtonDown("Jump"))
             {
                 if (this.m_Panel.HasRunningDisplay())
                 {

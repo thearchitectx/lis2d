@@ -1,10 +1,6 @@
-﻿using System.Linq;
-using System.IO;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
-using TheArchitect.Core;
 using TheArchitect.Game;
 
 namespace TheArchitect.MonoBehaviour.Save
@@ -12,7 +8,6 @@ namespace TheArchitect.MonoBehaviour.Save
 
     struct SaveData
     {
-        public bool CanSave;
         public string Slot;
         public string Label;
         public string Date;
@@ -21,7 +16,7 @@ namespace TheArchitect.MonoBehaviour.Save
 
     public class PanelSaveIO : UnityEngine.MonoBehaviour
     {
-        public const int SAVE_SLOTS = 0;
+        public const int SAVE_SLOTS = 20;
         public GameObject PanelSaveItemPrefab;
         public RectTransform TransformItemParent;
         public Text TextAllowed;
@@ -39,11 +34,13 @@ namespace TheArchitect.MonoBehaviour.Save
             ReadData();
         }
 
+        private static string SlotAsText(int slot)
+        {
+            return $"{slot+1:00}";
+        }
+
         private void ReadData()
         {
-            if (this.m_Context == null)
-                return;
-
             string rootPath = Application.persistentDataPath;
 
             foreach (Transform t in TransformItemParent)
@@ -52,21 +49,19 @@ namespace TheArchitect.MonoBehaviour.Save
             var worker = new System.ComponentModel.BackgroundWorker();
             worker.WorkerReportsProgress = true;
             worker.DoWork += (sender, args) => {
-                string[] saveSlotsFolders = new string[SAVE_SLOTS+1];
-                saveSlotsFolders[0] = "autosave";
-                for (var i = SAVE_SLOTS+1; i < SAVE_SLOTS+1; i++)
-                    saveSlotsFolders[i] = $"{i:00}";
+                string[] saveSlotsFolders = new string[SAVE_SLOTS];
+                for (var i = 0; i < SAVE_SLOTS; i++)
+                    saveSlotsFolders[i] = SlotAsText(i);
 
-                for (var i = 0; i < SAVE_SLOTS+1; i++)
+                for (var i = 0; i < SAVE_SLOTS; i++)
                 {
                     SaveData d = new SaveData() {
                         Slot = saveSlotsFolders[i],
                         Label = GameStateIO.LoadLabel(rootPath, saveSlotsFolders[i]),
                         Date = GameStateIO.LoadLastWrite(rootPath, saveSlotsFolders[i]),
                         Screen = GameStateIO.LoadImage(rootPath, saveSlotsFolders[i]),
-                        CanSave = i > 0
                     };
-                    worker.ReportProgress(i*100 / 11, d);
+                    worker.ReportProgress(i*100 / SAVE_SLOTS, d);
                 }
             };
 
@@ -75,6 +70,9 @@ namespace TheArchitect.MonoBehaviour.Save
 
                 PanelSaveItem item = Instantiate(PanelSaveItemPrefab).GetComponent<PanelSaveItem>();
                 item.transform.SetParent(this.TransformItemParent, false);
+                
+                item.IsCurrentItem = saveData.Slot == this.Context.GetVariable(GameState.SYSTEM_SAVE_SLOT, "01");
+
                 item.ImageScreen.color = Color.black;
                 if (saveData.Screen.Length>0)
                 {
@@ -94,13 +92,22 @@ namespace TheArchitect.MonoBehaviour.Save
                     ReadData();
                 });
 
-                item.ButtonSave.gameObject.SetActive( saveData.CanSave );
-                // item.ButtonSave.onClick.AddListener(() => StartCoroutine(DoSave(rootPath, slot, label)));
+                item.ButtonSwitch.onClick.AddListener( () => {
+                    const string TEXT_CONFIRM = "OVERWRITE?";
+                    Text btText = item.ButtonSwitch.GetComponentInChildren<Text>();
+                    string from = this.Context.GetVariable(GameState.SYSTEM_SAVE_SLOT, "01");
+                    if (saveData.Label == null || btText.text==TEXT_CONFIRM)
+                    {
+                        this.Context.SetVariable(GameState.SYSTEM_SAVE_SLOT, saveData.Slot);
+                        GameStateIO.CopySlot(rootPath, from, saveData.Slot);
+                        ReadData();
+                    }
+                    else
+                        btText.text = TEXT_CONFIRM;
+                });
 
-                item.ButtonLoad.gameObject.SetActive(saveData.Label != null);
+                item.ButtonLoad.interactable = saveData.Label != null;
                 item.ButtonLoad.onClick.AddListener(() => DoLoad(rootPath, saveData.Slot));
-
-                item.ButtonRename.gameObject.SetActive(saveData.Slot!="autosave" && saveData.Label != null);
 
                 item.ButtonRename.onClick.AddListener( () => {
                     item.InputLabel.gameObject.SetActive(true);
@@ -108,7 +115,6 @@ namespace TheArchitect.MonoBehaviour.Save
                     item.TextLabel.gameObject.SetActive(false);
                 });
 
-                item.ButtonDelete.gameObject.SetActive(saveData.Slot!="autosave" && saveData.Label != null);
                 item.ButtonDelete.onClick.AddListener( () => {
                     const string TEXT_CONFIRM = "CONFIRM?";
                     Text btText = item.ButtonDelete.GetComponentInChildren<Text>();
@@ -130,44 +136,20 @@ namespace TheArchitect.MonoBehaviour.Save
         {
             var state = GameStateIO.Load(root, slot);
             this.m_Context.ApplyStateInstance(state);
+            this.m_Context.SetVariable(GameState.SYSTEM_SAVE_SLOT, slot);
             UnityEngine.SceneManagement.SceneManager.LoadScene("XMLScriptScene");
         }
 
-        // private IEnumerator DoSave(string root, string slot, string label)
-        // {
-        //     // Save state
-        //     m_Context.State.Save(root, slot, label != null ? label : $"SAVE SLOT {slot}", Application.version);
-
-        //     // Prepare for screenshot
-        //     yield return TakeSaveScreenshot(root, slot);
-
-        //     ReadData();
-        // }
-
-        // public static IEnumerator TakeSaveScreenshot(string root, string slot)
-        // {
-        //     List<Canvas> allCanvas = GameObject.FindObjectsOfType<Canvas>().Where( c => c.enabled ).ToList();
-        //     allCanvas.ForEach( c => c.enabled = false );
-        //     PostProcessLayer ppl = GameObject.FindObjectOfType<PostProcessLayer>();
-        //     if (ppl!=null)
-        //         ppl.enabled = false;
-
-        //     yield return new WaitForEndOfFrame();
-            
-        //     Texture2D texScreen = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
-        //     try {
-        //         texScreen.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0, false);
-        //         texScreen.Apply();
-        //         texScreen = TextureScaler.scaled(texScreen, 256, Mathf.CeilToInt(256f / Screen.width * Screen.height));
-        //     } finally {
-        //         // Recover from screenshot
-        //         if (ppl!=null) ppl.enabled = true;
-        //         allCanvas.ForEach( c => c.enabled = true );
-        //     }
-
-        //     // Write screenshot
-        //     File.WriteAllBytes( $"{GameState.GetSlotPath(root, slot)}/{GameState.SCREEN_FILE_NAME}" , texScreen.EncodeToJPG(80));
-        // }
+        public static string FirstFreeSlot()
+        {
+            for (var i=1; i<= SAVE_SLOTS; i++)
+            {
+                string slot = SlotAsText(i);
+                if (!GameStateIO.HasData(Application.persistentDataPath, slot))
+                    return slot;
+            }
+            return null;
+        }
 
     }
 }

@@ -25,9 +25,12 @@ namespace TheArchitect.Game
                 );
 
                 Debug.Log($"Bootstraping ({startScriptPath}:{startNode})");
-                GameObject startScriptObject = new GameObject("StartScript");
+                
+                GameObject startScriptObject = new GameObject("BootstrapScript");
+                startScriptObject.SetActive(false);
                 XMLScriptController controller = startScriptObject.AddComponent<XMLScriptController>();
-                controller.Configure(startScriptPath, startNode, gameContext);
+                controller.PreStartConfigure(startScriptPath, startNode, gameContext);
+                startScriptObject.SetActive(true);
 
                 Destroy(this.gameObject);
             };

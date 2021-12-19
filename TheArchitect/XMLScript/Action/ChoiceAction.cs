@@ -10,10 +10,9 @@ namespace TheArchitect.XMLScript.Action
 {
     public class Choice
     {
+        [XmlIgnore]
+        public string Id;
         [XmlElement("check-flag", typeof(CheckFlag)),
-            // XmlElement("check-perk", typeof(CheckPerk)),
-            // XmlElement("check-stat", typeof(CheckStat)),
-            // XmlElement("check-item", typeof(CheckItem)),
             XmlElement("check-text", typeof(CheckText)),
             XmlElement("check-group", typeof(CheckGroupPredicate))]
         public Predicate[] Predicates;
@@ -21,6 +20,8 @@ namespace TheArchitect.XMLScript.Action
         public ChoicePos Pos = ChoicePos.NE;
         [XmlAttribute("out")]
         public string Output;
+        [XmlAttribute("style")]
+        public ChoiceStyle Style = ChoiceStyle.STANDARD;
         [XmlElement("text")]
         public string Text;
         [XmlElement("lock-reason")]
@@ -84,7 +85,7 @@ namespace TheArchitect.XMLScript.Action
                     return null;
                 }
                 else {
-                    return this.m_SelectedChoice.StartsWith("#") ? OUTPUT_NEXT : this.m_SelectedChoice;
+                    return string.IsNullOrEmpty(c.Output) || c.Output.StartsWith("#") ? OUTPUT_NEXT : c.Output;
                 }
             }
             
@@ -93,6 +94,9 @@ namespace TheArchitect.XMLScript.Action
 
         private System.Collections.IEnumerator Load(XMLScriptController controller)
         {
+            foreach (var c in this.Choices)
+                c.Id = System.Guid.NewGuid().ToString();
+
             var handle = Addressables.InstantiateAsync("choice-wheel.prefab", controller.transform);
 
             handle.Completed += (h) => {
@@ -107,8 +111,9 @@ namespace TheArchitect.XMLScript.Action
                     {
                         countChoicesVisible++;
                         this.m_Wheel.AddChoice(
-                            c.Output,
+                            c.Id,
                             c.Pos,
+                            c.Style,
                             condition ? ResourceString.Parse(c.Text, controller.Game.GetVariable) : ResourceString.Parse(c.LockReason, controller.Game.GetVariable),
                             condition
                         );
@@ -130,11 +135,11 @@ namespace TheArchitect.XMLScript.Action
             yield return handle;
         }
 
-        public Choice FindChoice(string output)
+        public Choice FindChoice(string id)
         {
             foreach (var c in this.Choices)
             {
-                if (c.Output == output)
+                if (c.Id == id)
                 {
                     return c;
                 }

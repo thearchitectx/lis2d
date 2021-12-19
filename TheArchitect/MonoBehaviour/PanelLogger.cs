@@ -11,19 +11,27 @@ public class PanelLogger : MonoBehaviour
 
     private float m_TimeToClose;
 
-    public void AddItem(string text, Sprite icon)
+    public void AddItem(string text, string icon)
     {
         this.m_TimeToClose = 0;
 
         var i = GameObject.Instantiate(this.m_ItemPrefab.gameObject).GetComponent<PanelLoggerItem>();
         i.Text.text = text;
-        i.Image.sprite = icon;
+        if (!string.IsNullOrEmpty(icon))
+        {
+            Addressables.LoadAssetAsync<Sprite>(icon).Completed += (handle) => {
+                i.Image.sprite = handle.Result;
+            };
+        }
         i.Image.gameObject.SetActive(icon != null);
         i.transform.SetParent(this.m_PanelRoot, false);
         
         i.OnLeft.AddListener( () => {
             i.transform.SetParent(null);
 
+            if (i.Image.sprite!=null)
+                Addressables.Release(i.Image.sprite);
+                
             if (!Addressables.ReleaseInstance(i.gameObject))
                 Destroy(i.gameObject);
 
@@ -44,12 +52,5 @@ public class PanelLogger : MonoBehaviour
 
     }
 
-    public void Update() 
-    {
-        if (this.m_TimeToClose > 0 && this.m_TimeToClose < Time.time)
-        {
-            if (!Addressables.ReleaseInstance(this.gameObject))
-                Destroy(this.gameObject);
-        }
-    }
+
 }
