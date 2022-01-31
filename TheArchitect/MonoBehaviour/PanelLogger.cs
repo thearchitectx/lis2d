@@ -6,15 +6,34 @@ using UnityEngine.UI;
 
 public class PanelLogger : MonoBehaviour
 {
+    public const string LOG_PREFIX = "UI:";
     [SerializeField] private PanelLoggerItem m_ItemPrefab;
     [SerializeField] private Transform m_PanelRoot;
 
-    private float m_TimeToClose;
+    void OnDestroy() {
+        Application.logMessageReceived -= HandleLog;
+    }
 
+    void OnDisable()
+    {
+        Application.logMessageReceived -= HandleLog;
+    }
+
+    void OnEnable()
+    {
+        Application.logMessageReceived += HandleLog;
+    }
+
+    private void HandleLog(string message, string stackTrace, LogType type)
+    {
+        if (type == LogType.Log && message.StartsWith(LOG_PREFIX))
+        {
+            AddItem(message.Substring(LOG_PREFIX.Length), null);
+        }
+    }
+    
     public void AddItem(string text, string icon)
     {
-        this.m_TimeToClose = 0;
-
         var i = GameObject.Instantiate(this.m_ItemPrefab.gameObject).GetComponent<PanelLoggerItem>();
         i.Text.text = text;
         if (!string.IsNullOrEmpty(icon))
@@ -40,10 +59,6 @@ public class PanelLogger : MonoBehaviour
             if (next != null)
             {
                 next.Leave();
-            }
-            else
-            {
-                this.m_TimeToClose = Time.time + 3;
             }
         });
 

@@ -14,11 +14,14 @@ namespace TheArchitect.XMLScript.Action
         NONE = 0,
         PARAGON = 1,
         RENEGADE = 2,
+        RIFT = 8,
         SAVE = 3,
         QUEST = 4,
         KEY = 5,
         LOCKPICK = 6,
         MONEY = 7,
+        BUTTERFLY = 9,
+        AFFINITY = 10
     }
 
     public class LogAction : XMLScriptAction

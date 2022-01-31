@@ -47,6 +47,7 @@ namespace TheArchitect.XMLScript
             XmlElement("trophy", typeof(TrophyAction)),
             XmlElement("switch-text", typeof(SwitchTextAction)),
             XmlElement("sfx", typeof(SFXAction)),
+            XmlElement("proxy", typeof(SetProxy)),
             XmlElement("bgm", typeof(BGMAction)),
         ]
         public XMLScriptAction[] Actions

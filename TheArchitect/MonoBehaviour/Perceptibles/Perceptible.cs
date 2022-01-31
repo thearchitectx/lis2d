@@ -17,11 +17,13 @@ namespace TheArchitect.MonoBehaviour.Perceptibles
         [SerializeField] private Transform m_OnActivated;
         [SerializeField] private Text m_Text;
         [SerializeField] private bool m_CrouchOnly;
+        [SerializeField] private bool m_AutoActivate = false;
 
         public Transform OnActivated { get { return this.m_OnActivated; } }
         public Transform OnNoticed { get { return this.m_OnNoticed; } }
         public string Label { get { return this.m_Label; } }
         public bool CrouchOnly { get { return this.m_CrouchOnly; } }
+        public bool AutoActivate { get { return this.m_AutoActivate; } }
 
         void Start()
         {

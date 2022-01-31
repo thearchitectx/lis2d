@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Xml.Serialization;
 using TheArchitect.XMLScript.Model;
+using TheArchitect.Core;
+using TheArchitect.Game;
 
 namespace TheArchitect.XMLScript.Action
 {
@@ -10,16 +12,22 @@ namespace TheArchitect.XMLScript.Action
         public string Trigger = null;
         [XmlAttribute("target")]
         public string Target = null;
+        [XmlAttribute("inc")]
+        public string IntInc = null;
         [XmlAttribute("idle")]
         public IdleAlias Idle = IdleAlias.NONE;
         [XmlAttribute("face")]
         public FaceAlias Face = FaceAlias.NONE;
+        [XmlAttribute("look")]
+        public LookAlias Look = LookAlias.NONE;
         [XmlAttribute("waitEndOfClip")]
         public int waitEndOfClip = -1;
         [XmlElement("bool")]
         public AnimBool[] Booleans = null;
         [XmlElement("int")]
         public AnimInt[] Integers = null;
+        [XmlElement("inc")]
+        public AnimIntInc[] IntIncs = null;
 
         [XmlIgnore]
         private Animator m_Animator;
@@ -56,13 +64,19 @@ namespace TheArchitect.XMLScript.Action
                 }
 
                 if (Trigger != null)
-                    this.m_Animator.SetTrigger(Trigger);
+                    this.m_Animator.SetTrigger(ResourceString.Parse(Trigger, controller.Game.GetVariable));
+
+                if (IntInc != null)
+                    this.m_Animator.SetInteger(IntInc, this.m_Animator.GetInteger(IntInc) + 1);
 
                 if (Idle != IdleAlias.NONE)
                     this.m_Animator.SetInteger("idle", (int) Idle);
                     
                 if (Face != FaceAlias.NONE)
                     this.m_Animator.SetInteger("face", (int) Face);
+                    
+                if (Look != LookAlias.NONE)
+                    this.m_Animator.SetInteger("look", (int) Look);
 
                 if (this.Booleans != null)
                     foreach (var i in this.Booleans)
@@ -71,6 +85,10 @@ namespace TheArchitect.XMLScript.Action
                 if (this.Integers != null)
                     foreach (var i in this.Integers)
                         this.m_Animator.SetInteger(i.Name, i.Value);
+
+                if (this.IntIncs != null)
+                    foreach (var i in this.IntIncs)
+                        this.m_Animator.SetInteger(i.Name, this.m_Animator.GetInteger(i.Name) + i.Value);
 
                 if (this.waitEndOfClip < 0)
                     this.m_Output = OUTPUT_NEXT;
@@ -91,6 +109,14 @@ namespace TheArchitect.XMLScript.Action
             return this.m_Output;
         }
 
+        public enum LookAlias
+        {
+            NONE = -100,
+            LEFT = -1,
+            NEUTRAL = 0,
+            RIGHT = 1
+        }
+
         public enum FaceAlias
         {
             NONE = 0,
@@ -99,6 +125,7 @@ namespace TheArchitect.XMLScript.Action
             NEUTRAL = 3,
             UPSET = 4,
             SIGH = 5,
+            SURPRISED = 6
         }
 
         public enum IdleAlias
@@ -119,6 +146,12 @@ namespace TheArchitect.XMLScript.Action
         {
             [XmlAttribute("name")] public string Name = null;
             [XmlAttribute("value")] public int Value = 0;
+        }
+
+        public class AnimIntInc
+        {
+            [XmlAttribute("name")] public string Name = null;
+            [XmlAttribute("value")] public int Value = 1;
         }
 
     }

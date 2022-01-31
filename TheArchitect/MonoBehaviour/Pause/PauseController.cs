@@ -46,18 +46,19 @@ namespace TheArchitect.MonoBehaviour.Pause
         }
 
         void OnDestroy() {
+            Application.logMessageReceived -= HandleException;
             this.m_Context.SetVariable(GameState.SYSTEM_PLAYTIME, this.m_Context.GetVariable(GameState.SYSTEM_PLAYTIME, 0f) + Time.timeSinceLevelLoad );
         }
 
-        // void OnDisable()
-        // {
-        //     Application.logMessageReceived -= HandleException;
-        // }
+        void OnDisable()
+        {
+            Application.logMessageReceived -= HandleException;
+        }
 
-        // void OnEnable()
-        // {
-        //     Application.logMessageReceived += HandleException;
-        // }
+        void OnEnable()
+        {
+            Application.logMessageReceived += HandleException;
+        }
 
         void Update()
         {
@@ -74,10 +75,10 @@ namespace TheArchitect.MonoBehaviour.Pause
 
             if (m_PanelPause == null && Input.GetKeyDown(KeyCode.F12))
             {
-                // this.m_IgnoreException = !this.m_IgnoreException;
-                // PlayerPrefs.SetInt(PLAYER_PREF_IGNORE_EXCEPTION, this.m_IgnoreException ? 1 : 0);
-                // PlayerPrefs.Save();
-                // Resources.Load<TheArchitect.Core.Data.Variables.Console>(ResourcePaths.SO_CONSOLE).Log("EXCEPTION_DIALOG", "Exception notification "+ (this.m_IgnoreException?"disabled":"enabled"));
+                this.m_IgnoreException = !this.m_IgnoreException;
+                PlayerPrefs.SetInt(PLAYER_PREF_IGNORE_EXCEPTION, this.m_IgnoreException ? 1 : 0);
+                PlayerPrefs.Save();
+                Debug.Log($"UI: Exception window {(this.m_IgnoreException?"disabled":"enabled")}", this);
             }
             if (m_PanelPause == null && Input.GetKeyDown(KeyCode.F11))
             {
@@ -186,14 +187,14 @@ namespace TheArchitect.MonoBehaviour.Pause
 
         }
 
-        private void HandleException(string condition, string stackTrace, LogType type)
+        private void HandleException(string message, string stackTrace, LogType type)
         {
             if (type == LogType.Exception && this.m_PanelException == null && !this.m_IgnoreException)
             {
                 Time.timeScale = 0;
                 this.m_PanelException = Instantiate(CanvasExceptionPrefab).GetComponentInChildren<PanelException>();
                 this.m_PanelException.transform.SetParent(this.transform, false);
-                this.m_PanelException.TextException.text = condition + "\n"+ stackTrace;
+                this.m_PanelException.TextException.text = message + "\n"+ stackTrace;
                 this.m_PanelException.ButtonWhatever.onClick.AddListener(() => {
                     Destroy(this.m_PanelException.gameObject);
                     Time.timeScale = 1;
@@ -201,6 +202,7 @@ namespace TheArchitect.MonoBehaviour.Pause
                 this.m_PanelException.ButtonStopShowing.onClick.AddListener(() => {
                     PlayerPrefs.SetInt(PLAYER_PREF_IGNORE_EXCEPTION, 1);
                     Destroy(this.m_PanelException.gameObject);
+                    this.m_IgnoreException = true;
                     Time.timeScale = 1;
                 });
                 this.m_PanelException.ButtonCopy.onClick.AddListener( () => {

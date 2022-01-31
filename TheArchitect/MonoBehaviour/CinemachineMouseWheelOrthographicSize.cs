@@ -13,6 +13,11 @@ public class CinemachineMouseWheelOrthographicSize : MonoBehaviour
 
     public float m_Target;
 
+    void SetToMinLens()
+    {
+        this.m_Target = this.m_MinSize;
+    }
+
     void Start()
     {
         this.m_Target = this.m_Camera.m_Lens.OrthographicSize;

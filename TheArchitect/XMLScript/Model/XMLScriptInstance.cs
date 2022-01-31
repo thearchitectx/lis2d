@@ -121,8 +121,15 @@ namespace TheArchitect.XMLScript.Model
             }
             else
             {
+                this.Nodes = new XMLScriptNode[] {
+                    new XMLScriptNode() { Actions = new XMLScriptAction[] {
+                        new SystemMessageAction() { Message = $"Node Id not found: '{id}' in '${{SYSTEM:SCRIPT:PATH}}'" },
+                        new BootstrapScriptAction() { ScriptPath = "title" }
+                    }}
+                };
+
                 UnityEngine.Debug.LogWarning($"Node Id not found: '{id}'");
-                this.m_CurrentNode = Nodes.Length;
+                this.m_CurrentNode = 0;
                 return false;
             }
         }

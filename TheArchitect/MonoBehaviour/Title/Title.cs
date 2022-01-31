@@ -25,6 +25,11 @@ namespace TheArchitect.MonoBehaviour.Title
             };
         }
 
+        public void OpenTheArchitect()
+        {
+            Application.OpenURL("https://www.patreon.com/the_architect");
+        }
+
         public void MenuQuit()
         {
             Application.Quit();

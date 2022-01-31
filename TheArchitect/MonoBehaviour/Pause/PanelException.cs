@@ -1,9 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
-namespace TheArchitect.MonoBehaviour
+namespace TheArchitect.MonoBehaviour.Pause
 {
-
     public class PanelException : UnityEngine.MonoBehaviour
     {
         [SerializeField] public Button ButtonWhatever;
@@ -11,5 +10,4 @@ namespace TheArchitect.MonoBehaviour
         [SerializeField] public Button ButtonCopy;
         [SerializeField] public Text TextException;
     }
-
 }

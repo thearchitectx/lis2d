@@ -13,7 +13,7 @@ namespace TheArchitect.MonoBehaviour
 
     public enum ChoiceStyle
     {
-        STANDARD, PARAGON, RENEGADE
+        STANDARD, PARAGON, RENEGADE, RIFT
     }
 
     public class ChoiceWheel : UnityEngine.MonoBehaviour
@@ -33,6 +33,7 @@ namespace TheArchitect.MonoBehaviour
         [SerializeField] private Button[] m_Buttons;
         [SerializeField] private RuntimeAnimatorController m_AnimatorParagon;
         [SerializeField] private RuntimeAnimatorController m_AnimatorRenegade;
+        [SerializeField] private RuntimeAnimatorController m_AnimatorRift;
 
         private List<Choice> m_Choices = new List<Choice>();
         public ChoiceEvent onChoice = new ChoiceEvent();
@@ -57,6 +58,8 @@ namespace TheArchitect.MonoBehaviour
                     b.GetComponent<Animator>().runtimeAnimatorController = this.m_AnimatorParagon;
                 if (c.style == ChoiceStyle.RENEGADE)
                     b.GetComponent<Animator>().runtimeAnimatorController = this.m_AnimatorRenegade;
+                if (c.style == ChoiceStyle.RIFT)
+                    b.GetComponent<Animator>().runtimeAnimatorController = this.m_AnimatorRift;
 
                 b.onClick.AddListener(
                     () => {  if (Time.timeScale>0) onChoice.Invoke(c.Id); }

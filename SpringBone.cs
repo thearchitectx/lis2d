@@ -63,6 +63,9 @@ public class SpringBone : MonoBehaviour
 
     public void UpdateSpring()
     {
+        if (!this.enabled)
+            return;
+            
         transform.localRotation = Quaternion.identity * localRotation;
 
         float sqrDt = Time.deltaTime * Time.deltaTime;

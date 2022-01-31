@@ -12,7 +12,7 @@ namespace TheArchitect.XMLScript.Action
         public override string Update(XMLScriptInstance instance, XMLScriptController controller)
         {
             instance.Outcome = Value;
-            return OUTPUT_NEXT;
+            return OUTPUT_END;
         }
 
     }

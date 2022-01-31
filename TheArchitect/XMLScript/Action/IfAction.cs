@@ -9,9 +9,6 @@ namespace TheArchitect.XMLScript.Action
     public class IfAction : XMLScriptAction
     {
         [XmlElement("check-flag", typeof(CheckFlag)),
-            // XmlElement("check-perk", typeof(CheckPerk)),
-            // XmlElement("check-stat", typeof(CheckStat)),
-            // XmlElement("check-item", typeof(CheckItem)),
             XmlElement("check-text", typeof(CheckText)),
             XmlElement("check-group", typeof(CheckGroupPredicate))
         ]

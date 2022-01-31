@@ -92,6 +92,8 @@ namespace TheArchitect.MonoBehaviour.Save
                     ReadData();
                 });
 
+                item.ButtonSwitch.interactable = !item.IsCurrentItem;
+
                 item.ButtonSwitch.onClick.AddListener( () => {
                     const string TEXT_CONFIRM = "OVERWRITE?";
                     Text btText = item.ButtonSwitch.GetComponentInChildren<Text>();
@@ -142,7 +144,7 @@ namespace TheArchitect.MonoBehaviour.Save
 
         public static string FirstFreeSlot()
         {
-            for (var i=1; i<= SAVE_SLOTS; i++)
+            for (var i=0; i<= SAVE_SLOTS; i++)
             {
                 string slot = SlotAsText(i);
                 if (!GameStateIO.HasData(Application.persistentDataPath, slot))

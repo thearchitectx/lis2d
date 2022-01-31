@@ -22,6 +22,8 @@ namespace TheArchitect.XMLScript.Action
         public float FadeSpeed = 1;
         [XmlAttribute("on-root")]
         public bool OnRoot = true;
+        [XmlAttribute("as-music")]
+        public bool AsMusic = true;
 
         private Coroutine m_Coroutine = null;
         

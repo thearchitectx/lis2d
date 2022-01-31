@@ -44,6 +44,7 @@ namespace TheArchitect.MonoBehaviour.Perceptibles
 
             int p = this.m_Collider.OverlapCollider(this.m_Filter, this.m_Results);
 
+            int autoActivateResult = -1;
             int perceptibleCount = 0;
             for (int i=0; i < p; i++)
             {
@@ -52,6 +53,9 @@ namespace TheArchitect.MonoBehaviour.Perceptibles
                 {
                     if (perceptible.CrouchOnly == this.m_PlayerController.Crouching)
                     {
+                        if (perceptible.AutoActivate)
+                            autoActivateResult = perceptibleCount;
+
                         this.m_PriorResults[perceptibleCount] = perceptible;
                         perceptible.OnNoticed.gameObject.SetActive(true);
                         perceptibleCount++;
@@ -59,11 +63,12 @@ namespace TheArchitect.MonoBehaviour.Perceptibles
                 }
             }
 
-            if (Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(0))
+            if (Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(0) || autoActivateResult > -1)
             {
-                if (perceptibleCount == 1)
+                if (perceptibleCount == 1 || autoActivateResult > -1)
                 {
-                    this.m_Activated = this.m_PriorResults[0];
+                    int idx = autoActivateResult > -1 ? autoActivateResult : 0;
+                    this.m_Activated = this.m_PriorResults[idx];
                     this.m_Activated.OnActivated.gameObject.SetActive(true);
                     this.m_Activated.OnNoticed.gameObject.SetActive(false);
                 }

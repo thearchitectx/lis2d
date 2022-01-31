@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TheArchitect.SceneObjects;
 
@@ -35,9 +33,13 @@ namespace TheArchitect.MonoBehaviour.Interactables
 
         void Update()
         {
+            if (Time.deltaTime == 0)
+                return;
+
             var point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             if(this.m_Collider.OverlapPoint(point))
             {
+                CursorManager.RequestTargetHand();
                 this.m_OnMouseOver.gameObject.SetActive(true);
                 if (Input.GetMouseButtonDown(0))
                 {

@@ -11,6 +11,12 @@ public class Parallax : MonoBehaviour
 
     [SerializeField] private float m_RotateFactorY;
     
+    public Vector2 ReferencePosition
+    {
+        set { this.m_ReferencePosition = value; }
+        get { return this.m_ReferencePosition; }
+    }
+
     void Start()
     {
         if (this.m_UseStartReferencePosition)
@@ -18,6 +24,11 @@ public class Parallax : MonoBehaviour
 
         if (this.m_ReferenceBackground == null)
             this.m_ReferenceBackground = this.transform.parent;
+    }
+
+    public void SetParallaxSpeed(float s)
+    {
+        this.m_Speed = s;
     }
 
     public void FindReferenceBackground(string name)

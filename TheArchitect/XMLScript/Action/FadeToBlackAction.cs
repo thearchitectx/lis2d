@@ -18,6 +18,8 @@ namespace TheArchitect.XMLScript.Action
         public bool Async = false;
         [XmlAttribute("layer")]
         public int SortingOrder = int.MaxValue;
+        [XmlAttribute("fill")]
+        public bool Fill = false;
 
         private Coroutine m_LoadCoroutine;
         private string m_Output = null;
@@ -61,15 +63,39 @@ namespace TheArchitect.XMLScript.Action
                 Image image = ftb.GetComponentInChildren<Image>();
 
                 float target = this.Speed < 0 ? 1 : 0;
-                image.color = new Color(0, 0, 0, target);
-
-                if (this.Async)
-                    this.m_Output = OUTPUT_NEXT;
-
-                while ( target >= 0 && target <= 1)
+                if (Fill)
                 {
-                    image.color = new Color(0, 0, 0, target += Time.deltaTime * this.Speed);
-                    yield return new WaitForEndOfFrame();
+                    // Fill transition
+                    image.fillMethod = Image.FillMethod.Radial360;
+                    image.fillOrigin = (int) ( this.Speed < 0 ? Image.Origin360.Bottom : Image.Origin360.Top );
+                    image.fillClockwise = this.Speed < 0;
+                    image.color = new Color(0, 0, 0, 1);
+
+                    image.fillAmount = target;
+
+                    if (this.Async)
+                        this.m_Output = OUTPUT_NEXT;
+
+                    while ( target >= 0 && target <= 1)
+                    {
+                        image.fillAmount = target += Time.deltaTime * this.Speed;
+                        yield return new WaitForEndOfFrame();
+                    }
+                }
+                else
+                {
+                    // Fade transition
+                    image.fillAmount = 1;
+                    image.color = new Color(0, 0, 0, target);
+
+                    if (this.Async)
+                        this.m_Output = OUTPUT_NEXT;
+
+                    while ( target >= 0 && target <= 1)
+                    {
+                        image.color = new Color(0, 0, 0, target += Time.deltaTime * this.Speed);
+                        yield return new WaitForEndOfFrame();
+                    }
                 }
 
                 if (!this.Keep)

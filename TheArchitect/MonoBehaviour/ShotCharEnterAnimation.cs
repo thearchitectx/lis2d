@@ -10,9 +10,16 @@ public class ShotCharEnterAnimation : MonoBehaviour
     [SerializeField] private float m_StartX = -15;
     [SerializeField] private float m_EndX = 0;
 
+    private Parallax m_Parallax;
+
     private bool m_KeepFinalPosition = false;
     private float m_Progress = 0;
     private bool m_DoAnimate = false;
+
+    void Start()
+    {
+        this.m_Parallax = this.GetComponent<Parallax>();
+    }
 
     public void TriggerEnter()
     {
@@ -60,9 +67,45 @@ public class ShotCharEnterAnimation : MonoBehaviour
         return this;
     }
 
+    public ShotCharEnterAnimation EndFarLeft()
+    {
+        this.m_EndX = -30;
+        return this;
+    }
+
+    public ShotCharEnterAnimation EndFarRight()
+    {
+        this.m_EndX = 30;
+        return this;
+    }
+
     public ShotCharEnterAnimation EndRight()
     {
         this.m_EndX = 15;
+        return this;
+    }
+
+    public ShotCharEnterAnimation EndSideRight()
+    {
+        this.m_EndX = 4.75f;
+        return this;
+    }
+
+    public ShotCharEnterAnimation StartSideRight()
+    {
+        this.m_StartX = 4.75f;
+        return this;
+    }
+
+    public ShotCharEnterAnimation StartSideLeft()
+    {
+        this.m_StartX = -4.75f;
+        return this;
+    }
+
+    public ShotCharEnterAnimation EndSideLeft()
+    {
+        this.m_EndX = -4.75f;
         return this;
     }
 
@@ -104,5 +147,10 @@ public class ShotCharEnterAnimation : MonoBehaviour
             this.m_ShotCharRoot.transform.position.y,
             this.m_ShotCharRoot.transform.position.z
         );
+
+        if (this.m_Parallax != null)
+        {
+            this.m_Parallax.ReferencePosition = new Vector2(x, this.m_Parallax.ReferencePosition.y);
+        }
     }
 }

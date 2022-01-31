@@ -16,7 +16,7 @@ namespace TheArchitect.XMLScript
     {
         public static XMLScriptInstance Load(string resourcePath)
         {
-            string path = $"{Application.streamingAssetsPath}/xml/{resourcePath}.xml";
+            string path = $"{Application.streamingAssetsPath}/xml/{resourcePath}.xml".Replace("\n","");
             if (!File.Exists(path)) 
             {
                 throw new System.Exception($"Can't find '{path}'");

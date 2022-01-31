@@ -25,14 +25,23 @@ namespace TheArchitect.XMLScript.Action
         [XmlElement("text")]
         public string Text;
         [XmlElement("lock-reason")]
-        public string LockReason = null;
+        public LockReason LockReason = null;
         // [XmlAttribute("icon")]
         // public ActionIcon Icon = ActionIcon.NONE;
         [XmlAttribute("icon-text")]
         public string IconText = null;
         [XmlElement("then")]
         public XMLScriptNode ThenNode;
+    }
 
+    public class LockReason
+    {
+        [XmlText]
+        public string Text = null;
+        [XmlElement("check-flag", typeof(CheckFlag)),
+            XmlElement("check-text", typeof(CheckText)),
+            XmlElement("check-group", typeof(CheckGroupPredicate))]
+        public Predicate[] VisibilityPredicate;
     }
 
     public class ChoiceAction : XMLScriptAction
@@ -107,14 +116,15 @@ namespace TheArchitect.XMLScript.Action
                 {
                     Choice c = Choices[i];
                     bool condition = Predicate.Resolve(controller.Game, c.Predicates);
-                    if (c.LockReason !=null || condition)
+                    bool showLockReason = !condition && c.LockReason !=null && Predicate.Resolve(controller.Game, c.LockReason.VisibilityPredicate);
+                    if ( showLockReason || condition)
                     {
                         countChoicesVisible++;
                         this.m_Wheel.AddChoice(
                             c.Id,
                             c.Pos,
                             c.Style,
-                            condition ? ResourceString.Parse(c.Text, controller.Game.GetVariable) : ResourceString.Parse(c.LockReason, controller.Game.GetVariable),
+                            condition ? ResourceString.Parse(c.Text, controller.Game.GetVariable) : ResourceString.Parse(c.LockReason.Text, controller.Game.GetVariable),
                             condition
                         );
                     }

@@ -26,6 +26,7 @@ public class ImageViewer : MonoBehaviour
         var handle = Addressables.LoadAssetAsync<Sprite>(spriteKey);
         handle.Completed += (h) => {
             this.m_Image.sprite = h.Result;
+            Debug.Log($"Loaded {spriteKey} to {h.Result} with texture  {h.Result.texture}");
         };
     }
 
@@ -61,14 +62,14 @@ public class ImageViewer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        this.m_ParentRect = this.m_Image.GetComponentInParent<Canvas>().GetComponent<RectTransform>();
+        this.m_ParentRect = this.m_Image.canvas.GetComponent<RectTransform>();
         this.m_Image.color = new Color(1,1,1,0);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (this.m_Image.sprite == null)
+        if (this.m_Image == null || this.m_Image.sprite == null || this.m_Image.sprite.texture == null)
             return;
 
         Vector2 v = Vector2.zero;
