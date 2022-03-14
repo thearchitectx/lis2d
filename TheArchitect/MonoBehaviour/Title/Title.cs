@@ -12,6 +12,7 @@ namespace TheArchitect.MonoBehaviour.Title
         [SerializeField] private AssetReferenceGameObject m_PanelSavePrefab;
         [SerializeField] private AssetReferenceGameObject m_PanelTrophiesPrefab;
         [SerializeField] private Transform m_Root;
+        [SerializeField] private TitleSettings m_Settings;
         [SerializeField] private Text m_TextVersion;
 
         private GameContext m_Context;
@@ -23,6 +24,11 @@ namespace TheArchitect.MonoBehaviour.Title
             this.m_ContextReference.LoadAssetAsync().Completed += handle => {
                 this.m_Context = handle.Result;
             };
+
+            this.m_Settings.onApply.AddListener(() => {
+                this.m_Settings.gameObject.SetActive(false);
+                this.m_Root.gameObject.SetActive(true);
+            });
         }
 
         public void OpenTheArchitect()
@@ -64,6 +70,13 @@ namespace TheArchitect.MonoBehaviour.Title
                 );
 
             };
+        }
+
+        public void MenuSettings()
+        {
+            this.m_Root.gameObject.SetActive(false);
+            this.m_Settings.gameObject.SetActive(true);
+            this.m_Settings.ReadFromPrefs();
         }
 
         public void MenuStart()

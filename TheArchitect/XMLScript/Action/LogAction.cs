@@ -21,7 +21,9 @@ namespace TheArchitect.XMLScript.Action
         LOCKPICK = 6,
         MONEY = 7,
         BUTTERFLY = 9,
-        AFFINITY = 10
+        AFFINITY = 10,
+        JOINT = 11,
+        CORRUPTION = 12,
     }
 
     public class LogAction : XMLScriptAction

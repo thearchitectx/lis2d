@@ -125,7 +125,8 @@ namespace TheArchitect.XMLScript.Action
             NEUTRAL = 3,
             UPSET = 4,
             SIGH = 5,
-            SURPRISED = 6
+            SURPRISED = 6,
+            EMBARRASSED = 7
         }
 
         public enum IdleAlias

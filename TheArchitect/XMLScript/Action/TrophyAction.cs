@@ -15,7 +15,7 @@ namespace TheArchitect.XMLScript.Action
         public override string Update(XMLScriptInstance xmlscript, XMLScriptController controller)
         {
             var trophy = Trophies.Get(Id);
-            if (trophy.Unlock())
+            if (trophy.Unlock() && GameSettings.GetTrophyNotifications())
             {
                 Addressables.InstantiateAsync("trophy-notification.prefab").Completed += (handle) => {
                     PanelTrophyItem panel = handle.Result.GetComponentInChildren<PanelTrophyItem>();

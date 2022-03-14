@@ -11,8 +11,11 @@ public class MouseMoveAnimationControl : SceneObject
     [SerializeField] private string m_Layer;
     [SerializeField] private float m_Speed = 1;
     [SerializeField] private string m_Axis = "Mouse Y";
+    [SerializeField] private string m_AxisAlternate;
     [SerializeField] private float m_StartPos = 0;
+    [SerializeField] private bool m_EnableAuto = true;
 
+    private float m_Auto = -1;
     private float m_Distance = 0;
     private float m_TargetDistance = 0;
 
@@ -50,10 +53,29 @@ public class MouseMoveAnimationControl : SceneObject
     // Update is called once per frame
     void Update()
     {
+        if (Time.deltaTime == 0)
+            return;
+
+        if (this.m_EnableAuto && Input.GetMouseButtonDown(2))
+            this.m_Auto = this.m_Auto >= 0 ? -1 : 0;
+
         if (!string.IsNullOrEmpty(this.m_Axis))
         {
             var oldPos = this.m_Pos;
-            this.m_Pos += Input.GetAxis(this.m_Axis) * this.m_Speed;
+
+            if (this.m_Auto >= 0)
+            {
+                this.m_Pos = Mathf.PingPong(Time.time, 1);
+            }
+            else
+            {
+                this.m_Pos += Input.GetAxis(this.m_Axis) * this.m_Speed;
+                if (!string.IsNullOrEmpty(this.m_AxisAlternate))
+                {
+                    this.m_Pos += Input.GetAxis(this.m_AxisAlternate) * this.m_Speed;
+                }
+            }
+
 
             this.m_Pos = Mathf.Clamp01(this.m_Pos);
 

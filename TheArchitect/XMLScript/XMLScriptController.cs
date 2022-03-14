@@ -94,6 +94,11 @@ namespace TheArchitect.XMLScript
             
         }
 
+        public void ClearProxies()
+        {
+            System.Array.Resize(ref this.m_Proxies, 0);
+        }
+
         public void AddProxy(string name, Transform target)
         {
             foreach (var p in this.m_Proxies)

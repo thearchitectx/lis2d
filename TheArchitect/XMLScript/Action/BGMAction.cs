@@ -45,6 +45,11 @@ namespace TheArchitect.XMLScript.Action
             var t = FindClipObject(controller);
             AudioSource existingSource = t!=null ? t.GetComponent<AudioSource>() : null;
 
+            var assetKey = $"sfx/{this.Loop}";
+            this.Volume = this.Volume 
+                        * ( Tags.HasTag(assetKey, Tags.TAG_MUSIC) ? GameSettings.GetVolumeMusic() : 1 )
+                        * ( Tags.HasTag(assetKey, Tags.TAG_NSFW) ? GameSettings.GetVolumeNFSW() : 1 );
+
             if (string.IsNullOrEmpty(Loop))
             {
                 if (existingSource !=null)
@@ -72,7 +77,7 @@ namespace TheArchitect.XMLScript.Action
                     GameObject.Destroy(existingSource.gameObject);
                 }
 
-                var handle = Addressables.LoadAssetAsync<AudioClip>($"sfx/{this.Loop}");
+                var handle = Addressables.LoadAssetAsync<AudioClip>(assetKey);
         
                 yield return handle;
 

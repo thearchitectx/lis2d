@@ -16,6 +16,8 @@ namespace TheArchitect.XMLScript.Action
         public string Copy = null;
         [XmlAttribute("set")]
         public string Set = null;
+        [XmlAttribute("append")]
+        public string Append = null;
         [XmlAttribute("unset")]
         public bool Unset = false;
         [XmlText]
@@ -38,6 +40,12 @@ namespace TheArchitect.XMLScript.Action
             if (!string.IsNullOrEmpty(Set ))
             {
                 controller.Game.SetVariable(resolvedName, ResourceString.Parse(Set, controller.Game.GetVariable));
+            }
+
+            if (!string.IsNullOrEmpty(Append ))
+            {
+                string s = controller.Game.GetVariable(resolvedName, "");
+                controller.Game.SetVariable(resolvedName, s + ResourceString.Parse(Append, controller.Game.GetVariable));
             }
 
             if (Unset)

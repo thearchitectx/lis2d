@@ -13,6 +13,8 @@ namespace TheArchitect.XMLScript.Action
         public string Target = "";
         [XmlAttribute("target-key")]
         public string TargetKey = "";
+        [XmlAttribute("rename")]
+        public string Rename;
         [XmlAttribute("active")]
         public bool Active = true;
         [XmlAttribute("destroy")]
@@ -43,6 +45,9 @@ namespace TheArchitect.XMLScript.Action
                     Debug.LogWarning($"Can't find resolve object '{Target}'");
                     return OUTPUT_NEXT;
                 }
+
+                if (!string.IsNullOrEmpty(this.Rename))
+                    this.m_Target.gameObject.name = this.Rename;
             
                 this.m_SceneObject = this.m_Target.GetComponent<SceneObject>();
 
@@ -166,7 +171,11 @@ namespace TheArchitect.XMLScript.Action
     }
 
     public class Param { public virtual object Value { get { return null; } } }
-    public class StringParam : Param { [XmlAttribute("value")] public string m_Value = null; public override object Value { get { return this.m_Value; } } }
+    public class StringParam : Param { 
+        [XmlAttribute("value")] public string m_Value = null;
+        [XmlText] public string m_Value2 = null;
+        public override object Value { get { return string.IsNullOrEmpty(this.m_Value2) ? this.m_Value : this.m_Value2; } } 
+    }
     public class IntParam : Param { [XmlAttribute("value")] public int m_Value = 0; public override object Value { get { return this.m_Value; } } }
     public class FloatParam : Param { [XmlAttribute("value")] public float m_Value = 0; public override object Value { get { return this.m_Value; } } }
     public class BoolParam : Param { [XmlAttribute("value")] public bool m_Value = false; public override object Value { get { return this.m_Value; } } }

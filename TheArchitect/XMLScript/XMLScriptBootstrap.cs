@@ -12,6 +12,8 @@ namespace TheArchitect.Game
 
         void Start()
         {
+            AudioListener.volume = GameSettings.GetVolumeMain();
+            
             this.m_Context.LoadAssetAsync<GameContext>().Completed += (handle) => {
                 var gameContext = handle.Result;
                 
