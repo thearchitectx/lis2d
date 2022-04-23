@@ -27,6 +27,7 @@ namespace TheArchitect.MonoBehaviour
         [SerializeField] private Sprite m_SpriteLeft;
         [SerializeField] private Sprite m_SpriteRight;
         [SerializeField] private Sprite m_SpriteSubjective;
+        [SerializeField] private Sprite m_SpriteThought;
         [SerializeField] public RectTransform m_MainRectTransform;
         [SerializeField] public bool ClampToScreen = true;
         [SerializeField] public Image m_ImageForward = null;
@@ -43,13 +44,15 @@ namespace TheArchitect.MonoBehaviour
         private bool m_IsRollingText;
         private DialogStyle m_Style;
         private bool m_LastFrameWasRight;
+        private bool m_IsThought;
 
         public bool IsRollingText { get { return m_IsRollingText; } }
         public bool HasPendingText { get { return this.m_MessagePosition < this.m_Message.Length; } }
 
-        public void Display(CharacterData character, string message, bool instant = false, DialogStyle style = DialogStyle.SUBJECTIVE)
+        public void Display(CharacterData character, string message, bool thought = false, DialogStyle style = DialogStyle.SUBJECTIVE)
         {
             this.m_Style = style;
+            this.m_IsThought = thought;
 
             this.m_ImageCharacterName.gameObject.SetActive(!string.IsNullOrEmpty(character.DefaultDisplayName));
             this.m_TextName.gameObject.SetActive(!string.IsNullOrEmpty(character.DefaultDisplayName));
@@ -61,7 +64,7 @@ namespace TheArchitect.MonoBehaviour
             }
 
             StopAllCoroutines();
-            StartCoroutine(_DisplayTextMessage(character, message, instant));
+            StartCoroutine(_DisplayTextMessage(character, message, thought));
         }
 
         public void SkipDisplay()
@@ -136,6 +139,9 @@ namespace TheArchitect.MonoBehaviour
             else
             {
                 var spr = (this.m_Style == DialogStyle.SUBJECTIVE)  ? this.m_SpriteSubjective : this.m_SpriteLeft;
+                if (this.m_IsThought)
+                    spr = this.m_SpriteThought;
+                    
                 if (spr != this.m_ImageDialogBack.sprite)
                 {
                     this.m_ImageDialogBack.sprite = spr;
@@ -157,7 +163,7 @@ namespace TheArchitect.MonoBehaviour
             this.m_ImageDialogBack.enabled = true;
         }
 
-        IEnumerator _DisplayTextMessage(CharacterData character, string message, bool instant)
+        IEnumerator _DisplayTextMessage(CharacterData character, string message, bool thought)
         {
             this.m_Message = string.IsNullOrEmpty(message) ? "..." : message;
             this.m_MessagePosition = 1;
@@ -166,10 +172,10 @@ namespace TheArchitect.MonoBehaviour
 
             yield return handle;
 
-            this.m_BlipAudioSource.clip = handle.Result;
+            this.m_BlipAudioSource.clip = thought ? null : handle.Result;
             this.m_ImageForward.gameObject.SetActive(false);
 
-            if (this.m_WriteTimeInterval == 0 || instant)
+            if (this.m_WriteTimeInterval == 0)
             {
                 this.m_MessagePosition = this.m_Message.Length;
             }

@@ -30,11 +30,26 @@ public class PlayerController : MonoBehaviour
         this.m_InputActive = active;
     }
 
+    public float GetLookingDir()
+    {
+        return ((Vector2)this.m_PerceptionField.right) == Vector2.left ? 0 : 180;
+    }
+
     public void LookLeft()
     {
         this.m_SkeletonRootMirror.gameObject.SetActive(true);
         this.m_SkeletonRoot.gameObject.SetActive(false);
         this.m_PerceptionField.right = Vector2.left;
+    }
+
+    public void WarpTo(string objectName)
+    {
+        var g = GameObject.Find(objectName);
+        if (g != null)
+        {
+            this.transform.position = g.transform.position;
+            this.LookAt(g.transform.rotation);
+        }
     }
 
     public void LookRight()

@@ -26,6 +26,7 @@ namespace TheArchitect.XMLScript.Action
             var player = controller.FindProxy("#Player");
             if (player != null)
             {
+                controller.Game.SetVariable(GameState.SYSTEM_PLAYER_ROT, player.GetComponent<PlayerController>().GetLookingDir());
                 controller.Game.SetVariable(GameState.SYSTEM_PLAYER_X, player.localPosition.x);
                 controller.Game.SetVariable(GameState.SYSTEM_PLAYER_Y, player.localPosition.y);
             }

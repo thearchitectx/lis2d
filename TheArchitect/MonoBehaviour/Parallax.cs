@@ -52,12 +52,6 @@ public class Parallax : MonoBehaviour
         }
     }
 
-    void OnDrawGizmos() {
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawWireCube(this.m_ReferenceCameraOrigin, Vector3.one * 0.25f);
-        Gizmos.DrawLine(this.m_ReferenceCameraOrigin, Camera.main.transform.position);
-    }
-
     [ContextMenu("Copy Current Main Camera Origin")]
     public void CopyReferenceCameraOrigin() {
         this.m_ReferenceCameraOrigin = Camera.main.transform.transform.position;

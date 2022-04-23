@@ -8,6 +8,7 @@ namespace TheArchitect.MonoBehaviour
 {
     public class PlayerLaptopUI : SceneObject
     {
+        [SerializeField] private ScrollRect m_ScrollRect;
         [SerializeField] private Text m_TextUrl;
         [SerializeField] private Text m_TextContent;
         [SerializeField] private Image m_ImageContent;
@@ -33,6 +34,8 @@ namespace TheArchitect.MonoBehaviour
             this.m_TextContent.text = text;
 
             LayoutRebuilder.ForceRebuildLayoutImmediate(this.m_TextContent.transform.parent.GetComponent<RectTransform>());
+
+            this.m_ScrollRect.verticalScrollbar.value = 1;
         }
 
         public void SetImageContent(string sprite)

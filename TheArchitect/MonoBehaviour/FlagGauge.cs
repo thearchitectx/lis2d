@@ -20,6 +20,7 @@ public class FlagGauge : SceneObject
     private Animator m_Animator;
     private int m_LastStageChangeCount = int.MinValue;
     private float m_CurrentValue;
+    private bool m_InstantFill = false;
 
     public void SetFlag(string flag)
     {
@@ -55,6 +56,11 @@ public class FlagGauge : SceneObject
             this.m_MaxColor = c;
     }
 
+    public void SetInstantFill(bool b)
+    {
+        this.m_InstantFill = b;
+    }
+
     void Start()
     {
         this.m_GameContext.LoadAssetAsync().Completed += handle => {
@@ -74,7 +80,14 @@ public class FlagGauge : SceneObject
             this.m_CurrentValue = Mathf.InverseLerp(this.m_MinValue, this.m_MaxValue, this.m_Context.GetVariable(m_Flag, 0));
         }
 
-        this.m_ImageValue.fillAmount = Mathf.MoveTowards(this.m_ImageValue.fillAmount, this.m_CurrentValue, Time.deltaTime * 0.25f);
+        if (this.m_InstantFill)
+        {
+            this.m_ImageValue.fillAmount = this.m_CurrentValue;
+        }
+        else
+        {
+            this.m_ImageValue.fillAmount = Mathf.MoveTowards(this.m_ImageValue.fillAmount, this.m_CurrentValue, Time.deltaTime * 0.25f);
+        }
         this.m_ImageValue.color = Color32.Lerp(this.m_MinColor, this.m_MaxColor, this.m_ImageValue.fillAmount);
 
         if (this.m_Animator!=null)

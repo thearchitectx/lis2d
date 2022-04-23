@@ -121,6 +121,11 @@ public class ShotCharEnterAnimation : MonoBehaviour
         return this;
     }
 
+    public void SetSpeed(float speed)
+    {
+        this.m_Speed = Mathf.Clamp(speed, .1f, 10);
+    }
+
     // Update is called once per frame
     void LateUpdate()
     {

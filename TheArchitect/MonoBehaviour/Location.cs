@@ -10,9 +10,10 @@ public class Location : SceneObject
     void Start()
     {
 
+        float dir = this.m_GameContext.GetVariable(GameState.SYSTEM_PLAYER_ROT, this.m_Player.GetLookingDir());
         float x = this.m_GameContext.GetVariable(GameState.SYSTEM_PLAYER_X, this.m_Player.transform.localPosition.x);
         float y = this.m_GameContext.GetVariable(GameState.SYSTEM_PLAYER_Y, this.m_Player.transform.localPosition.y);
-        var rot = Quaternion.identity;
+        var rot = Quaternion.Euler(0, dir, 0);
 
         string spawn = this.m_GameContext.GetVariable(GameState.SYSTEM_PLAYER_SPAWN, "");
         if (!string.IsNullOrEmpty(spawn))

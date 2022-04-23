@@ -21,4 +21,13 @@ public class AudioSourceTrigger : MonoBehaviour
         }
         this.m_AudioSource.Play();
     }
+
+    public void PlayAudioSourceFixed(int index)
+    {
+        if (this.m_RandomClips!=null && this.m_RandomClips.Length > index)
+        {
+            this.m_AudioSource.clip = this.m_RandomClips[index];
+        }
+        this.m_AudioSource.Play();
+    }
 }

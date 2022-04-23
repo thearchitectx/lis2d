@@ -13,6 +13,7 @@ namespace TheArchitect.Game
         public const string SYSTEM_PLAYTIME = "SYSTEM:PLAYTIME";
         public const string SYSTEM_SCRIPT_PATH_VARIABLE = "SYSTEM:SCRIPT:PATH";
         public const string SYSTEM_SCRIPT_NODE_VARIABLE = "SYSTEM:SCRIPT:NODE";
+        public const string SYSTEM_PLAYER_ROT = "SYSTEM:PLAYER:ROT";
         public const string SYSTEM_PLAYER_X = "SYSTEM:PLAYER:X";
         public const string SYSTEM_PLAYER_Y = "SYSTEM:PLAYER:Y";
         public const string SYSTEM_PLAYER_SPAWN = "SYSTEM:PLAYER:SPAWN";

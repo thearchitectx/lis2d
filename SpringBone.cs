@@ -16,11 +16,14 @@ public class SpringBone : MonoBehaviour
     public SpringCollider[] colliders;
 
     public bool debug;
+    public bool RecalculateChildSpringLength = true;
+    
 
     public float springLength;
     private Quaternion localRotation;
     private Vector3 currTipPos;
     private Vector3 prevTipPos;
+    private Vector3 startTipPos;
 
     private void Awake()
     {
@@ -48,7 +51,7 @@ public class SpringBone : MonoBehaviour
 
     private void OnEnable()
     {
-        if (Child)
+        if (Child && RecalculateChildSpringLength)
         {
             springLength = Vector3.Distance(transform.position, Child.transform.position);
             currTipPos = Child.transform.position;
@@ -56,7 +59,7 @@ public class SpringBone : MonoBehaviour
         }
         else
         {
-            currTipPos = prevTipPos = transform.position + (transform.right) * springLength;
+            startTipPos = currTipPos = prevTipPos = transform.position + (transform.right) * springLength;
         }
 
     }
@@ -65,6 +68,12 @@ public class SpringBone : MonoBehaviour
     {
         if (!this.enabled)
             return;
+            
+        if (Time.timeScale > 1)
+        {
+            currTipPos = prevTipPos = startTipPos;
+            return;
+        }
             
         transform.localRotation = Quaternion.identity * localRotation;
 

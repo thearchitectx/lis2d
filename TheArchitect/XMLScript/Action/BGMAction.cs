@@ -54,13 +54,13 @@ namespace TheArchitect.XMLScript.Action
             {
                 if (existingSource !=null)
                 {
-                    while (existingSource.volume != this.Volume)
+                    while (existingSource !=null && existingSource.volume != this.Volume)
                     {
                         existingSource.volume = Mathf.MoveTowards(existingSource.volume, this.Volume, Time.deltaTime * this.FadeSpeed);
                         yield return new WaitForEndOfFrame();
                     }
 
-                    if (this.Volume == 0)
+                    if (existingSource !=null && this.Volume == 0)
                         GameObject.Destroy(existingSource.gameObject);
                 }
             }

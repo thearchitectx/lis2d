@@ -11,10 +11,12 @@ namespace TheArchitect.MonoBehaviour.Perceptibles
     [RequireComponent(typeof(Collider2D))]
     public class Perceptible : UnityEngine.MonoBehaviour
     {
+        public const string ITEM_GLINT_ACTIVATOR = "ITEM:PERCEPTION_BAND";
         [SerializeField] private AssetReferenceGameContext m_Context;
         [SerializeField] private string m_Label;
         [SerializeField] private Transform m_OnNoticed;
         [SerializeField] private Transform m_OnActivated;
+        [SerializeField] private Transform m_Glint;
         [SerializeField] private Text m_Text;
         [SerializeField] private bool m_CrouchOnly;
         [SerializeField] private bool m_AutoActivate = false;
@@ -33,6 +35,16 @@ namespace TheArchitect.MonoBehaviour.Perceptibles
                 {
                     this.m_Text.text = this.m_Label;
                 }
+
+                if (this.m_Glint == null)
+                {
+                    this.m_Glint = transform.Find("Glint");
+                }
+                if (this.m_Glint != null)
+                {
+                    this.m_Glint.gameObject.SetActive(this.m_CrouchOnly && handle.Result.GetVariable(ITEM_GLINT_ACTIVATOR, 0) > 0);
+                }
+                
                 m_Context.ReleaseAsset();
             };
         }

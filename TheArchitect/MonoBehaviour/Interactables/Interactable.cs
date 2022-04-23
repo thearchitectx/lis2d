@@ -12,6 +12,7 @@ namespace TheArchitect.MonoBehaviour.Interactables
         [SerializeField] private Collider2D m_Collider;
         [SerializeField] private string m_Label;
         [SerializeField] private string m_Outcome;
+        [SerializeField] private bool m_Autoclick = false;
 
         void OnEnable()
         {
@@ -41,7 +42,7 @@ namespace TheArchitect.MonoBehaviour.Interactables
             {
                 CursorManager.RequestTargetHand();
                 this.m_OnMouseOver.gameObject.SetActive(true);
-                if (Input.GetMouseButtonDown(0))
+                if (Input.GetMouseButtonDown(0) || this.m_Autoclick)
                 {
                     StopAllCoroutines();
                     StartCoroutine(this.DelayedOutcome());

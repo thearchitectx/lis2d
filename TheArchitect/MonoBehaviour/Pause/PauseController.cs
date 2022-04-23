@@ -21,6 +21,7 @@ namespace TheArchitect.MonoBehaviour.Pause
         [SerializeField] public GameObject CanvasTrophiesPrefab;
         [SerializeField] public GameObject CanvasFPSPrefab;
         [SerializeField] private Volume m_Volume;
+        [SerializeField] private GameObject m_FastForwardFX;
         [SerializeField] private AssetReferenceGameContext m_ContextAsset;
         
         private GameContext m_Context;
@@ -33,10 +34,11 @@ namespace TheArchitect.MonoBehaviour.Pause
         private Canvas[] m_DisabledCanvases;
 
         private bool m_IgnoreException;
+        private bool m_Paused;
 
         void Start()
         {
-            Time.timeScale = 1;
+            this.m_Paused = false;
             this.m_ContextAsset.LoadAssetAsync().Completed += (handle) => this.m_Context = handle.Result;
 
             if (PlayerPrefs.GetInt(PLAYER_PREF_SHOW_FPS, 0) == 1)
@@ -63,7 +65,25 @@ namespace TheArchitect.MonoBehaviour.Pause
         void Update()
         {
             if (this.m_Context == null)
-                return; 
+                return;
+
+            
+            if (this.m_Paused)
+            {
+                this.m_FastForwardFX.SetActive(false);
+                Time.timeScale = 0;
+            }
+            else if (Input.GetKey(KeyCode.X))
+            {
+                Time.timeScale = Mathf.MoveTowards(Time.timeScale, 5, Time.unscaledDeltaTime * 10);
+                this.m_FastForwardFX.SetActive(true);
+            }
+            else
+            {
+                this.m_FastForwardFX.SetActive(false);
+                Time.timeScale = 1;
+            }
+                
 
             if (Input.GetButtonDown("Options"))
             {
@@ -98,7 +118,7 @@ namespace TheArchitect.MonoBehaviour.Pause
             this.m_PanelPause = Instantiate(this.PanelPausePrefab.gameObject).GetComponent<PanelPause>();
             this.m_PanelPause.transform.SetParent(this.transform, false);
             this.m_PanelPause.Context = this.m_Context;
-            Time.timeScale = 0;
+            this.m_Paused = true;
         }
 
         public void Close()
@@ -118,7 +138,7 @@ namespace TheArchitect.MonoBehaviour.Pause
             Destroy(this.m_PanelPause.gameObject);
             this.m_PanelPause = null;
 
-            Time.timeScale = 1;
+            this.m_Paused = false;
 
             foreach (Canvas c in this.m_DisabledCanvases)
                 if (c!=null) c.enabled = true;
@@ -191,19 +211,19 @@ namespace TheArchitect.MonoBehaviour.Pause
         {
             if (type == LogType.Exception && this.m_PanelException == null && !this.m_IgnoreException)
             {
-                Time.timeScale = 0;
+                this.m_Paused = true;
                 this.m_PanelException = Instantiate(CanvasExceptionPrefab).GetComponentInChildren<PanelException>();
                 this.m_PanelException.transform.SetParent(this.transform, false);
                 this.m_PanelException.TextException.text = message + "\n"+ stackTrace;
                 this.m_PanelException.ButtonWhatever.onClick.AddListener(() => {
                     Destroy(this.m_PanelException.gameObject);
-                    Time.timeScale = 1;
+                    this.m_Paused = false;
                 });
                 this.m_PanelException.ButtonStopShowing.onClick.AddListener(() => {
                     PlayerPrefs.SetInt(PLAYER_PREF_IGNORE_EXCEPTION, 1);
                     Destroy(this.m_PanelException.gameObject);
                     this.m_IgnoreException = true;
-                    Time.timeScale = 1;
+                    this.m_Paused = false;
                 });
                 this.m_PanelException.ButtonCopy.onClick.AddListener( () => {
                     GUIUtility.systemCopyBuffer = this.m_PanelException.TextException.text;

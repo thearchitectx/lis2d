@@ -24,6 +24,8 @@ namespace TheArchitect.XMLScript.Action
         AFFINITY = 10,
         JOINT = 11,
         CORRUPTION = 12,
+        BAND = 13,
+        CALENDAR = 14,
     }
 
     public class LogAction : XMLScriptAction

@@ -13,8 +13,8 @@ namespace TheArchitect.XMLScript.Action
     {
         [XmlAttribute("wait")]
         public float Wait;
-        [XmlAttribute("instant")]
-        public bool Instant;
+        [XmlAttribute("thought")]
+        public bool Thought;
         [XmlText]
         public string Text;
     }
@@ -105,10 +105,10 @@ namespace TheArchitect.XMLScript.Action
                 this.m_Panel.Display(
                     this.m_Character,
                     ResourceString.Parse(this.Messages[this.m_CurrentMessage].Text, controller.Game.GetVariable),
-                    this.Messages[this.m_CurrentMessage].Instant,
-                    this.Style
+                    this.Messages[this.m_CurrentMessage].Thought,
+                    this.Messages[this.m_CurrentMessage].Thought ? DialogStyle.SUBJECTIVE : this.Style
                 );
-            } else if (this.TimeToLive == 0 && Input.GetMouseButtonDown(0) || Input.GetButtonDown("Jump"))
+            } else if (this.TimeToLive == 0 && Input.GetMouseButtonDown(0) || Input.GetButtonDown("Jump") || Input.GetKey(KeyCode.X))
             {
                 if (this.m_Panel.HasRunningDisplay())
                 {

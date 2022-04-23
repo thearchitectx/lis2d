@@ -1,3 +1,4 @@
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using System.Xml.Serialization;
@@ -21,6 +22,8 @@ namespace TheArchitect.XMLScript.Action
         public int Destroy = -1;
         [XmlElement("message")]
         public ObjectMessage[] Messages = null;
+        [XmlElement("assign")]
+        public PropertyAssign[] Assgins = null;
         [XmlElement("outcome")]
         public ObjectOutcome[] Outcomes = null;
 
@@ -37,12 +40,12 @@ namespace TheArchitect.XMLScript.Action
         {
             if (this.m_Target == null)
             {
-                Target = !string.IsNullOrEmpty(Target) ? Target : TargetKey;
+                var ActualTarget = !string.IsNullOrEmpty(Target) ? ResourceString.Parse(Target, controller.Game.GetVariable) : TargetKey;
                 
-                this.m_Target = controller.FindProxy(Target);
+                this.m_Target = controller.FindProxy(ActualTarget);
                 if (this.m_Target == null)
                 {
-                    Debug.LogWarning($"Can't find resolve object '{Target}'");
+                    Debug.LogWarning($"Can't find resolve object '{ActualTarget}'");
                     return OUTPUT_NEXT;
                 }
 
@@ -54,6 +57,7 @@ namespace TheArchitect.XMLScript.Action
                 this.m_Target.gameObject.SetActive(this.Active);
 
                 SendMessages(Messages, this.m_Target.gameObject, controller.Game.GetVariable);
+                SetProperties(Assgins, this.m_Target.gameObject, controller.Game.GetVariable);
 
                 if (Destroy == 0)
                 {
@@ -93,7 +97,6 @@ namespace TheArchitect.XMLScript.Action
             }
 
             return OUTPUT_NEXT;
-            
 
         }
 
@@ -138,6 +141,70 @@ namespace TheArchitect.XMLScript.Action
                 }
         }
 
+        public static void SetProperties(PropertyAssign[] assigns, GameObject target, System.Func<string, object> context)
+        {
+            if (assigns==null)
+                return;
+
+            foreach (PropertyAssign pa in assigns)
+            {
+                bool resolved = false;
+                object value = pa.Param.Value;
+                if (value is string)
+                    value = ResourceString.Parse((string) pa.Param.Value, context);
+
+                foreach (Component comp in target.GetComponents<Component>()) {
+                    const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Public | 
+                                            BindingFlags.Instance | BindingFlags.Static;
+
+                    FieldInfo field = comp.GetType().GetField(pa.Name, flags);
+                    if (field != null  && 
+                        (
+                            (field.FieldType == typeof(bool) && pa.Param is BoolParam)
+                            || (field.FieldType == typeof(string) && pa.Param is StringParam)
+                            || (field.FieldType == typeof(int) && pa.Param is IntParam)
+                            || (field.FieldType == typeof(float) && pa.Param is FloatParam)
+                        )
+                    )
+                    {
+                        field.SetValue(comp, value);
+                        resolved = true;
+                    }
+                    
+                    PropertyInfo property = comp.GetType().GetProperty(pa.Name, flags);
+                    if (property != null  && 
+                        (
+                            (property.PropertyType == typeof(bool) && pa.Param is BoolParam)
+                            || (property.PropertyType == typeof(string) && pa.Param is StringParam)
+                            || (property.PropertyType == typeof(int) && pa.Param is IntParam)
+                            || (property.PropertyType == typeof(float) && pa.Param is FloatParam)
+                        )
+                    )
+                    {
+                        property.SetValue(comp, value);
+                        resolved = true;
+                    }
+                }
+
+                if (!resolved)
+                    Debug.LogWarning($"Property not found: {pa.Name}:{pa.Param.GetType().Name}");
+            }
+        }
+
+    }
+
+    public class PropertyAssign
+    {
+        [XmlAttribute("name")]
+        public string Name = null;
+        [
+            XmlElement("string", typeof(StringParam)),
+            XmlElement("int", typeof(IntParam)),
+            XmlElement("float", typeof(FloatParam)),
+            XmlElement("bool", typeof(BoolParam))
+        ]
+        public Param Param;
+        
     }
 
     public class ObjectMessage

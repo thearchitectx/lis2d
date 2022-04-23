@@ -12,23 +12,30 @@ namespace TheArchitect.MonoBehaviour.Pause
         [SerializeField] public Text m_TextParagonScore;
         [SerializeField] public Image m_ImageFillRenegade;
         [SerializeField] public Text m_TextRenegadeScore;
+        [SerializeField] public Image m_ImageFillRift;
+        [SerializeField] public Text m_TextRiftEnergy;
 
         [SerializeField] private GameContext m_Game;
 
         private float m_MaxReputation = 30;
+        private float m_MaxRift = 10;
         private int m_RenegadeScore = 0;
         private int m_ParagonScore = 0;
+        private int m_RiftScore = 0;
 
         void Start()
         {
             this.m_ParagonScore = this.m_Game.GetVariable("PLAYER:STAT:PARAGON", 0);
             this.m_RenegadeScore = this.m_Game.GetVariable("PLAYER:STAT:RENEGADE", 0);
+            this.m_RiftScore = this.m_Game.GetVariable("PLAYER:STAT:RIFT", 0);
 
             this.m_TextParagonScore.text = $"{this.m_ParagonScore:D2}";
             this.m_TextRenegadeScore.text = $"{this.m_RenegadeScore:D2}";
+            this.m_TextRiftEnergy.text = $"{this.m_RiftScore:D2}";
 
             this.m_ImageFillParagon.fillAmount = 0;
             this.m_ImageFillRenegade.fillAmount = 0;
+            this.m_ImageFillRift.fillAmount = 0;
         }
 
         void Update()
@@ -42,6 +49,7 @@ namespace TheArchitect.MonoBehaviour.Pause
 
             this.m_ImageFillParagon.fillAmount = Mathf.MoveTowards(this.m_ImageFillParagon.fillAmount, this.m_ParagonScore / this.m_MaxReputation, Time.unscaledDeltaTime);
             this.m_ImageFillRenegade.fillAmount = Mathf.MoveTowards(this.m_ImageFillRenegade.fillAmount, this.m_RenegadeScore / this.m_MaxReputation, Time.unscaledDeltaTime);
+            this.m_ImageFillRift.fillAmount = Mathf.MoveTowards(this.m_ImageFillRift.fillAmount, this.m_RiftScore / this.m_MaxRift, Time.unscaledDeltaTime);
         }
     }
 

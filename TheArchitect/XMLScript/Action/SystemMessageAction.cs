@@ -12,6 +12,8 @@ namespace TheArchitect.XMLScript.Action
     {
         [XmlText]
         public string Message = "Message";
+        [XmlAttribute("simple")]
+        public bool Simple = false;
         
         private Coroutine m_LoadCoroutine;
         private GameObject m_Panel;
@@ -48,7 +50,9 @@ namespace TheArchitect.XMLScript.Action
 
         private IEnumerator Load(XMLScriptController controller)
         {
-            var handle = Addressables.InstantiateAsync("panel-system-message.prefab", controller.transform, false, true);
+            var handle = Addressables.InstantiateAsync(
+                Simple ? "panel-simple-message.prefab" : "panel-system-message.prefab", 
+                controller.transform, false, true);
 
             yield return handle;
 
