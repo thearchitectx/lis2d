@@ -36,7 +36,8 @@ namespace TheArchitect.MonoBehaviour.Save
 
         private static string SlotAsText(int slot)
         {
-            return $"{slot+1:00}";
+
+            return slot == 0 ? GameStateIO.AUTOSAVE_SLOT : $"{slot:00}";
         }
 
         private void ReadData()
@@ -49,7 +50,7 @@ namespace TheArchitect.MonoBehaviour.Save
             var worker = new System.ComponentModel.BackgroundWorker();
             worker.WorkerReportsProgress = true;
             worker.DoWork += (sender, args) => {
-                string[] saveSlotsFolders = new string[SAVE_SLOTS];
+                string[] saveSlotsFolders = new string[SAVE_SLOTS+1];
                 for (var i = 0; i < SAVE_SLOTS; i++)
                     saveSlotsFolders[i] = SlotAsText(i);
 
@@ -71,7 +72,7 @@ namespace TheArchitect.MonoBehaviour.Save
                 PanelSaveItem item = Instantiate(PanelSaveItemPrefab).GetComponent<PanelSaveItem>();
                 item.transform.SetParent(this.TransformItemParent, false);
                 
-                item.IsCurrentItem = saveData.Slot == this.Context.GetVariable(GameState.SYSTEM_SAVE_SLOT, "01");
+                item.IsCurrentItem = saveData.Slot == GameStateIO.AUTOSAVE_SLOT;
 
                 item.ImageScreen.color = Color.black;
                 if (saveData.Screen.Length>0)
@@ -81,7 +82,7 @@ namespace TheArchitect.MonoBehaviour.Save
                     item.ImageScreen.sprite = Sprite.Create(t, new Rect(0, 0, t.width, t.height), new Vector2(t.width/2, t.height/2));
                     item.ImageScreen.color = Color.white;
                 }
-                item.TextSlot.text = saveData.Slot;
+                item.TextSlot.text = saveData.Slot == GameStateIO.AUTOSAVE_SLOT ? "AUTOSAVE" : saveData.Slot;
                 item.TextLabel.text = !string.IsNullOrEmpty(saveData.Label) ? saveData.Label : "-- EMPTY --";
                 item.TextDate.text = !string.IsNullOrEmpty(saveData.Date) ? saveData.Date : "--";
 
@@ -92,15 +93,14 @@ namespace TheArchitect.MonoBehaviour.Save
                     ReadData();
                 });
 
-                item.ButtonSwitch.interactable = !item.IsCurrentItem;
+                item.ButtonSwitch.gameObject.SetActive(!item.IsCurrentItem);
 
                 item.ButtonSwitch.onClick.AddListener( () => {
                     const string TEXT_CONFIRM = "OVERWRITE?";
                     Text btText = item.ButtonSwitch.GetComponentInChildren<Text>();
-                    string from = this.Context.GetVariable(GameState.SYSTEM_SAVE_SLOT, "01");
+                    string from = "autosave";
                     if (saveData.Label == null || btText.text==TEXT_CONFIRM)
                     {
-                        this.Context.SetVariable(GameState.SYSTEM_SAVE_SLOT, saveData.Slot);
                         GameStateIO.CopySlot(rootPath, from, saveData.Slot);
                         ReadData();
                     }
@@ -108,15 +108,24 @@ namespace TheArchitect.MonoBehaviour.Save
                         btText.text = TEXT_CONFIRM;
                 });
 
+
                 item.ButtonLoad.interactable = saveData.Label != null;
+                item.ButtonLoad.GetComponentInChildren<Text>().text = saveData.Label == null ? "" : "LOAD";
                 item.ButtonLoad.onClick.AddListener(() => DoLoad(rootPath, saveData.Slot));
 
+
+                item.ButtonRename.interactable = saveData.Label != null;
+                item.ButtonRename.gameObject.SetActive(!item.IsCurrentItem);
+                item.ButtonRename.GetComponentInChildren<Text>().text = saveData.Label == null ? "" : "RENAME";
                 item.ButtonRename.onClick.AddListener( () => {
                     item.InputLabel.gameObject.SetActive(true);
                     item.InputLabel.text = item.TextLabel.text;
                     item.TextLabel.gameObject.SetActive(false);
                 });
 
+                item.ButtonDelete.interactable = saveData.Label != null;
+                item.ButtonDelete.gameObject.SetActive(!item.IsCurrentItem);
+                item.ButtonDelete.GetComponentInChildren<Text>().text = saveData.Label == null ? "" : "DELETE";
                 item.ButtonDelete.onClick.AddListener( () => {
                     const string TEXT_CONFIRM = "CONFIRM?";
                     Text btText = item.ButtonDelete.GetComponentInChildren<Text>();
@@ -138,19 +147,7 @@ namespace TheArchitect.MonoBehaviour.Save
         {
             var state = GameStateIO.Load(root, slot);
             this.m_Context.ApplyStateInstance(state);
-            this.m_Context.SetVariable(GameState.SYSTEM_SAVE_SLOT, slot);
             UnityEngine.SceneManagement.SceneManager.LoadScene("XMLScriptScene");
-        }
-
-        public static string FirstFreeSlot()
-        {
-            for (var i=0; i<= SAVE_SLOTS; i++)
-            {
-                string slot = SlotAsText(i);
-                if (!GameStateIO.HasData(Application.persistentDataPath, slot))
-                    return slot;
-            }
-            return null;
         }
 
     }

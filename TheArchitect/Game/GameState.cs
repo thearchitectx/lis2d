@@ -9,7 +9,6 @@ namespace TheArchitect.Game
     public partial class GameState
     {
         public const string SYSTEM_VERSION = "SYSTEM:VERSION";
-        public const string SYSTEM_SAVE_SLOT = "SYSTEM:SAVE:SLOT";
         public const string SYSTEM_PLAYTIME = "SYSTEM:PLAYTIME";
         public const string SYSTEM_SCRIPT_PATH_VARIABLE = "SYSTEM:SCRIPT:PATH";
         public const string SYSTEM_SCRIPT_NODE_VARIABLE = "SYSTEM:SCRIPT:NODE";

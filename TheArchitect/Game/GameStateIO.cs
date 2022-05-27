@@ -11,6 +11,7 @@ namespace TheArchitect.Game
 {
     public struct GameStateIO
     {
+        public const string AUTOSAVE_SLOT = "autosave";
         public const string SAVE_SUB_DIRECTORY = "saves";
         public const string STATE_FILE_NAME = "state.xml";
         public const string LABEL_FILE_NAME = "label.txt";

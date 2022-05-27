@@ -82,16 +82,6 @@ namespace TheArchitect.MonoBehaviour.Title
         public void MenuStart()
         {
             this.m_Context.ApplyStateInstance(new GameState());
-            
-            var slot = PanelSaveIO.FirstFreeSlot();
-            if (string.IsNullOrEmpty(slot))
-            {
-                slot = "01";
-                this.m_Context.SetVariable("FLG:0", 1);
-            }
-            this.m_Context.SetVariable(GameState.SYSTEM_SAVE_SLOT, slot);
-
-            Debug.Log($"Starting new game on slot {slot}");
             UnityEngine.SceneManagement.SceneManager.LoadScene("XMLScriptScene");
         }
 

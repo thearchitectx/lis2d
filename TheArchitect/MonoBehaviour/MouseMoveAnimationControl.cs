@@ -14,6 +14,7 @@ public class MouseMoveAnimationControl : SceneObject
     [SerializeField] private string m_AxisAlternate;
     [SerializeField] private float m_StartPos = 0;
     [SerializeField] private bool m_EnableAuto = true;
+    [SerializeField] private float m_AutoTimeMultiplier = 1;
 
     private float m_Auto = -1;
     private float m_Distance = 0;
@@ -65,7 +66,7 @@ public class MouseMoveAnimationControl : SceneObject
 
             if (this.m_Auto >= 0)
             {
-                this.m_Pos = Mathf.PingPong(Time.time, 1);
+                this.m_Pos = Mathf.PingPong(Time.time * this.m_AutoTimeMultiplier, 1);
             }
             else
             {

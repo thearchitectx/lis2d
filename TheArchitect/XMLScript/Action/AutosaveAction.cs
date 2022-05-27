@@ -18,16 +18,15 @@ namespace TheArchitect.XMLScript.Action
         {
             string rootPath = Application.persistentDataPath;
             string label = string.IsNullOrEmpty(Label) ? "Save" : ResourceString.Parse(this.Label, controller.Game.GetVariable);
-            string slot = controller.Game.GetVariable(GameState.SYSTEM_SAVE_SLOT, "01");
             string version = Application.version;
 
-            LogAction logAction = new LogAction() { Text = string.IsNullOrEmpty(Log)?$"Saving at slot {slot}..." :Log, Icon = UIIcon.SAVE };
+            LogAction logAction = new LogAction() { Text = string.IsNullOrEmpty(Log)?$"Autosaving..." :Log, Icon = UIIcon.SAVE };
             logAction.Log(controller);
 
             controller.Game.SetVariable(GameState.SYSTEM_SCRIPT_PATH_VARIABLE, controller.ScriptPath );
             controller.Game.SetVariable(GameState.SYSTEM_SCRIPT_NODE_VARIABLE, xmlscript.CurrentNode.Id );
 
-            controller.StartCoroutine( GameStateIO.SaveScreenshot(rootPath, slot) );
+            controller.StartCoroutine( GameStateIO.SaveScreenshot(rootPath, GameStateIO.AUTOSAVE_SLOT) );
             
             var state = controller.Game.BuildStateInstance();
             var worker = new System.ComponentModel.BackgroundWorker();
@@ -35,7 +34,7 @@ namespace TheArchitect.XMLScript.Action
                 args.Result = GameStateIO.Save(
                     state,
                     rootPath,
-                    slot,
+                    GameStateIO.AUTOSAVE_SLOT,
                     ResourceString.Parse(label, controller.Game.GetVariable),
                     version
                 );
