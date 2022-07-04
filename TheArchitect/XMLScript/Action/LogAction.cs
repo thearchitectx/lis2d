@@ -26,6 +26,7 @@ namespace TheArchitect.XMLScript.Action
         CORRUPTION = 12,
         BAND = 13,
         CALENDAR = 14,
+        MIND = 15
     }
 
     public class LogAction : XMLScriptAction

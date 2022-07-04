@@ -15,8 +15,17 @@ namespace TheArchitect.XMLScript.Action
         public float Wait;
         [XmlAttribute("thought")]
         public bool Thought;
+        [XmlAttribute("font-size")]
+        public int FontSize;
+        [XmlAttribute("font-style")]
+        public UnityEngine.FontStyle FontStyle;
+        [XmlAttribute("font-color")]
+        public string FontColor;
+        [XmlAttribute("font")]
+        public int Font;
         [XmlText]
         public string Text;
+
     }
 
     public class DialogAction : XMLScriptAction
@@ -102,6 +111,15 @@ namespace TheArchitect.XMLScript.Action
             {
                 this.m_CurrentMessage = this.m_NextMessage;
                 this.m_Panel.gameObject.SetActive(true);
+                this.m_Panel.m_TextMessage.fontSize = this.Messages[this.m_CurrentMessage].FontSize == 0 ? 16 : this.Messages[this.m_CurrentMessage].FontSize;
+                this.m_Panel.m_TextMessage.fontStyle = this.Messages[this.m_CurrentMessage].FontStyle;
+                this.m_Panel.m_TextMessage.font = this.m_Panel.m_Fonts[this.Messages[this.m_CurrentMessage].Font];
+                this.m_Panel.SetTargetAlpha(1);
+                Color color;
+                if (!string.IsNullOrEmpty(this.Messages[this.m_CurrentMessage].FontColor)
+                     && ColorUtility.TryParseHtmlString(this.Messages[this.m_CurrentMessage].FontColor, out color)) {
+                    this.m_Panel.m_TextMessage.color = color;
+                }
                 this.m_Panel.Display(
                     this.m_Character,
                     ResourceString.Parse(this.Messages[this.m_CurrentMessage].Text, controller.Game.GetVariable),

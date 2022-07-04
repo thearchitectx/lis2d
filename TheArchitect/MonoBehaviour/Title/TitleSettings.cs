@@ -9,6 +9,7 @@ public class TitleSettings : MonoBehaviour
     [SerializeField] private Slider m_SliderSoundMusic;
     [SerializeField] private Slider m_SliderSoundNSFW;
     [SerializeField] private Toggle m_ToggleTrophyNotifications;
+    [SerializeField] private Toggle m_ToggleDisableCamNoise;
     [SerializeField] private InputField m_InputTargetFramerate;
 
     public UnityEngine.Events.UnityEvent onApply = new UnityEngine.Events.UnityEvent();
@@ -24,6 +25,7 @@ public class TitleSettings : MonoBehaviour
         this.m_SliderSoundMusic.value = GameSettings.GetVolumeMusic();
         this.m_SliderSoundNSFW.value = GameSettings.GetVolumeNFSW();
         this.m_ToggleTrophyNotifications.isOn = GameSettings.GetTrophyNotifications();
+        this.m_ToggleDisableCamNoise.isOn = GameSettings.GetDisableCameraNoise();
         this.m_InputTargetFramerate.text = GameSettings.GetTargetFPS().ToString();
     }
 
@@ -33,6 +35,7 @@ public class TitleSettings : MonoBehaviour
         GameSettings.SetVolumeMusic(this.m_SliderSoundMusic.value);
         GameSettings.SetVolumeNFSW(this.m_SliderSoundNSFW.value);
         GameSettings.SetTrophyNotifications(this.m_ToggleTrophyNotifications.isOn);
+        GameSettings.SetDisableCameraNoise(this.m_ToggleDisableCamNoise.isOn);
         int fps;
         if (int.TryParse(this.m_InputTargetFramerate.text, out fps))
             GameSettings.SetTargetFPS( fps );

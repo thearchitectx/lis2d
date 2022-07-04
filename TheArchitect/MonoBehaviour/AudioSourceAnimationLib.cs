@@ -5,6 +5,8 @@ using UnityEngine;
 public class AudioSourceAnimationLib : MonoBehaviour
 {
     [SerializeField] private AudioClip[] m_Clips;
+    [SerializeField] private bool m_NSFW = false;
+    private AudioSource m_Player;
 
     public void PlayAny()
     {
@@ -18,12 +20,29 @@ public class AudioSourceAnimationLib : MonoBehaviour
     {
         AudioClip clip = this.m_Clips[index];
         
-        GameObject tempAudioSource = new GameObject("TempAudio");
-        AudioSource audioSource = tempAudioSource.AddComponent<AudioSource>();
-        audioSource.clip = clip;
-        audioSource.volume = 1;
-        audioSource.spatialBlend = 0.0f;
-        audioSource.Play();
-        GameObject.Destroy(audioSource.gameObject, clip.length);
+        if (this.m_Player == null)
+        {
+            var g = new GameObject("AudioSourceAnimationLibPlayer");
+            this.m_Player = g.AddComponent<AudioSource>();
+        }
+        else if (this.m_Player.isPlaying)
+        {
+            GameObject.Destroy(this.m_Player.gameObject, this.m_Player.clip.length - this.m_Player.time);
+            var g = new GameObject("AudioSourceAnimationLibPlayer");
+            this.m_Player = g.AddComponent<AudioSource>();
+        }
+
+        this.m_Player.clip = clip;
+        
+        if (this.m_NSFW)
+            this.m_Player.volume = GameSettings.GetVolumeNFSW();
+        else
+            this.m_Player.volume = 1;
+
+        this.m_Player.volume = 1;
+        this.m_Player.spatialBlend = 0.0f;
+        this.m_Player.Play();
+
     }
+
 }

@@ -20,6 +20,8 @@ namespace TheArchitect.XMLScript.Action
         public string Proxy = null;
         [XmlAttribute("active")]
         public bool Active = true;
+        [XmlAttribute("y-pos")]
+        public float YPos = float.NaN;
         [XmlAttribute("world-position-stays")]
         public bool WorldPositionStays = false;
         [XmlAttribute("ignore-if-exists")]
@@ -59,11 +61,15 @@ namespace TheArchitect.XMLScript.Action
 
             var handle = Addressables.InstantiateAsync(this.Key, p, WorldPositionStays);
             handle.Completed += (h) => {
-                var instance = handle.Result;
+                GameObject instance = handle.Result;
+                CheckCamNoisePref(instance);
                 instance.name = string.IsNullOrEmpty(this.Rename) ? this.Key : this.Rename;
 
                 if (!string.IsNullOrEmpty(this.Proxy))
                     controller.AddProxy(this.Proxy, instance.transform);
+
+                if (!float.IsNaN(this.YPos))
+                    instance.transform.position = new Vector3(instance.transform.position.x, this.YPos, instance.transform.position.z);
 
                 ObjectAction.SendMessages(this.Messages, instance, controller.Game.GetVariable);
 
@@ -85,6 +91,22 @@ namespace TheArchitect.XMLScript.Action
                 Addressables.ReleaseInstance(handle.Result);
             }
 
+        }
+
+        private void CheckCamNoisePref(GameObject obj)
+        {
+            if (GameSettings.GetDisableCameraNoise())
+            {
+                var cams = obj.transform.GetComponentsInChildren<Cinemachine.CinemachineVirtualCamera>();
+                foreach (var cam in cams)
+                {
+                    var noise = cam.GetCinemachineComponent<Cinemachine.CinemachineBasicMultiChannelPerlin>();
+                    if (noise!=null) {
+                        noise.m_AmplitudeGain = 0;
+                        noise.m_FrequencyGain = 0;
+                    }
+                }
+            }
         }
 
     }

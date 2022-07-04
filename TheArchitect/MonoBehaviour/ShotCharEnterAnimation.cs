@@ -81,7 +81,7 @@ public class ShotCharEnterAnimation : MonoBehaviour
 
     public ShotCharEnterAnimation EndRight()
     {
-        this.m_EndX = 15;
+        this.m_EndX = 20;
         return this;
     }
 

@@ -36,15 +36,18 @@ namespace TheArchitect.MonoBehaviour
         [SerializeField] public Text m_TextMessage = null;
         [SerializeField] public Text m_TextName = null;
         [SerializeField] public AudioSource m_BlipAudioSource = null;
+        [SerializeField] public Font[] m_Fonts;
 
         private string m_Message = null;
         private int m_MessagePosition = 0;
         private float m_WriteTimeInterval = 0.025f;
         private RectTransform m_CanvasTransform;
+        private CanvasGroup m_CanvasGroup;
         private bool m_IsRollingText;
         private DialogStyle m_Style;
         private bool m_LastFrameWasRight;
         private bool m_IsThought;
+        private float m_TargetAlpha;
 
         public bool IsRollingText { get { return m_IsRollingText; } }
         public bool HasPendingText { get { return this.m_MessagePosition < this.m_Message.Length; } }
@@ -77,14 +80,28 @@ namespace TheArchitect.MonoBehaviour
             return this.m_MessagePosition < this.m_Message.Length;
         }
 
+        void OnEnable()
+        {
+            if (this.m_CanvasGroup!=null)
+                this.m_CanvasGroup.alpha = 0;
+        }
+
         void Start()
         {
             var canvas = GetComponent<Canvas>();
+            this.m_CanvasGroup =  canvas.transform.GetComponent<CanvasGroup>();
+            this.m_CanvasGroup.alpha = 0;
             this.m_CanvasTransform = canvas.transform.GetComponent<RectTransform>();
             this.m_ImageForward.gameObject.SetActive(false);
             this.m_ImageDialogBack.sprite = null;
             this.m_MainRectTransform.anchoredPosition = new Vector2(-10000, -100000);
             this.m_TextMessage.text = "";
+            this.m_TargetAlpha = 1;
+        }
+
+        public void SetTargetAlpha(float f)
+        {
+            this.m_TargetAlpha = f;
         }
 
         void Update()
@@ -93,6 +110,12 @@ namespace TheArchitect.MonoBehaviour
             {
                 m_BlipAudioSource.enabled = false;
                 return;
+            }
+
+            this.m_CanvasGroup.alpha = Mathf.MoveTowards(this.m_CanvasGroup.alpha, this.m_TargetAlpha, Time.deltaTime * 6);
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                this.m_TargetAlpha = this.m_TargetAlpha == 1 ? 0 : 1;
             }
 
             if (this.TrackedTransform != null && this.m_Style != DialogStyle.SUBJECTIVE)

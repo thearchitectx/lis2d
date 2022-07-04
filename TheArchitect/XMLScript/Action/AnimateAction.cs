@@ -22,6 +22,8 @@ namespace TheArchitect.XMLScript.Action
         public LookAlias Look = LookAlias.NONE;
         [XmlAttribute("waitEndOfClip")]
         public int waitEndOfClip = -1;
+        [XmlAttribute("speed")]
+        public float speed = float.NaN;
         [XmlElement("bool")]
         public AnimBool[] Booleans = null;
         [XmlElement("int")]
@@ -62,6 +64,9 @@ namespace TheArchitect.XMLScript.Action
                     Debug.LogWarning($"Can't find animator on target - TARGET:'{Target}'");
                     return OUTPUT_NEXT;
                 }
+
+                if (!float.IsNaN(this.speed))
+                    this.m_Animator.speed = this.speed;
 
                 if (Trigger != null)
                     this.m_Animator.SetTrigger(ResourceString.Parse(Trigger, controller.Game.GetVariable));

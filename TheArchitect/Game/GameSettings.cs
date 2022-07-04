@@ -9,6 +9,7 @@ public class GameSettings
     const string PREF_VOLUME_NFSW = "PREF_VOLUME_NFSW";
     const string PREF_TROPHY_NOTIF = "PREF_TROPHY_NOTIF";
     const string PREF_TARGET_FPS = "PREF_TARGET_FPS";
+    const string PREF_DISABLE_CAMERA_NOISE = "PREF_DISABLE_CAMERA_NOISE";
 
     public static void SetVolumeMain(float volume)
     {
@@ -23,6 +24,11 @@ public class GameSettings
     public static void SetVolumeNFSW(float volume)
     {
         PlayerPrefs.SetFloat(PREF_VOLUME_NFSW, Mathf.Clamp01(volume));
+    }
+
+    public static void SetDisableCameraNoise(bool enabled)
+    {
+        PlayerPrefs.SetInt(PREF_DISABLE_CAMERA_NOISE, enabled ? 1 : 0);
     }
 
     public static void SetTrophyNotifications(bool enabled)
@@ -55,6 +61,11 @@ public class GameSettings
         return PlayerPrefs.GetInt(PREF_TROPHY_NOTIF, 1) != 0;
     }
 
+    public static bool GetDisableCameraNoise()
+    {
+        return PlayerPrefs.GetInt(PREF_DISABLE_CAMERA_NOISE, 0) != 0;
+    }
+
     public static int GetTargetFPS()
     {
         return PlayerPrefs.GetInt(PREF_TARGET_FPS, 60);
@@ -67,6 +78,7 @@ public class GameSettings
         PlayerPrefs.DeleteKey(PREF_VOLUME_MAIN);
         PlayerPrefs.DeleteKey(PREF_VOLUME_MUSIC);
         PlayerPrefs.DeleteKey(PREF_VOLUME_NFSW);
+        PlayerPrefs.DeleteKey(PREF_DISABLE_CAMERA_NOISE);
         PlayerPrefs.Save();
     }
 
